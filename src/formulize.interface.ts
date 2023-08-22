@@ -1,32 +1,38 @@
-import { OptionText, PipeParse, PipeInsert } from './option.interface';
-import { Tree } from 'metric-parser/dist/types/tree/simple.tree/type';
+import type { OptionText, PipeParse, PipeInsert } from "./option.interface";
+import type { Tree } from "metric-parser/dist/types/tree/simple.tree/type";
 
-export * from 'metric-parser/dist/types/ast.d';
-export * from 'metric-parser/dist/types/tree/simple.tree/type.d';
+export * from "metric-parser/dist/types/ast.d";
+export * from "metric-parser/dist/types/tree/simple.tree/type.d";
 
-export interface FormulizeGlobal extends NodeJS.Global {
-    window: Window;
-    document: Document;
-    HTMLElement: typeof HTMLElement;
-    $: JQueryStatic;
-    jQuery: JQueryStatic;
-}
+export type FormulizeGlobal = {
+  window: Window;
+  document: Document;
+  HTMLElement: typeof HTMLElement;
 
-export interface FormulizeOptions extends FormulizeEventOptions {
-    id?: string;
-    text?: OptionText,
-    pipe?: OptionPipe
-}
+  /**
+   * @deprecated
+   */
+  $: JQueryStatic;
 
-export interface FormulizeEventOptions {
-    input?<T extends Tree>(value: T): void
-}
+  /**
+   * @deprecated
+   */
+  jQuery: JQueryStatic;
+} & NodeJS.Global;
 
-export interface OptionPipe {
-    insert?: PipeInsert;
-    parse?: PipeParse;
-}
+export type FormulizeOptions = {
+  id?: string;
+  text?: OptionText;
+  pipe?: OptionPipe;
+} & FormulizeEventOptions;
 
-export interface FormulizeFunction {
-    (options?: FormulizeOptions): JQuery;
-}
+export type FormulizeEventOptions = {
+  input?<T extends Tree>(value: T): void;
+};
+
+export type OptionPipe = {
+  insert?: PipeInsert;
+  parse?: PipeParse;
+};
+
+export type FormulizeFunction = (options?: FormulizeOptions) => JQuery;

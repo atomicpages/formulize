@@ -1,10 +1,10 @@
-import { FormulizeData } from './ui/ui.interface';
+import type { FormulizeData } from "./ui/ui.interface";
 
-export interface OptionText {
-    formula?: string;
-    error?: string;
-    pass?: string;
-}
+export type OptionText = {
+  formula?: string;
+  error?: string;
+  pass?: string;
+};
 
 export type PipeInsert = (data: FormulizeData) => any;
 

@@ -1,10 +1,10 @@
-import { FormulizeOptions } from './formulize.interface';
+import type { FormulizeOptions } from "./formulize.interface";
 
 export const defaultOptions: FormulizeOptions = {
-    id: 'formulize',
-    text: {
-        formula: 'formula',
-        error: 'error',
-        pass: 'passed'
-    }
+  id: "formulize",
+  text: {
+    formula: "formula",
+    error: "error",
+    pass: "passed",
+  },
 };

@@ -1,5 +1,6 @@
-const _MODULE_VERSION_ = '0.0.13';
+// TODO: use process.env.VERSION
+const _MODULE_VERSION_ = "0.1.0";
 
 export function getVersion(): string {
-    return _MODULE_VERSION_;
+  return _MODULE_VERSION_;
 }

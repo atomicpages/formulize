@@ -1,7 +1,7 @@
-import '../style/formulize.scss';
-import { pluginBinder } from './formulize.plugin';
+import "../style/formulize.scss";
+import { pluginBinder } from "./formulize.plugin";
 
-export { UI } from './ui/ui';
-export * from './global';
+export { UI } from "./ui/ui";
+export * from "./global";
 
 pluginBinder();
