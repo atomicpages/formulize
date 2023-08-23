@@ -1,6 +1,18 @@
 import { FormulizeTokenHelper } from "../token.helper";
 
 export class UIElementHelper {
+  public static createElement<T extends HTMLElement>(name: keyof HTMLElementTagNameMap, classes: string[], attrs?: Record<string, string>) {
+    const elem = document.createElement(name);
+
+    elem.classList.add(...classes);
+
+    if (attrs) {
+      Object.entries(attrs).forEach(([key, value]) => elem.setAttribute(key, value));
+    }
+
+    return elem as T;
+  }
+
   public static getDragElement(id: string): HTMLElement {
     return $(`<div class="${id}-drag"></div>`)[0];
   }
@@ -21,8 +33,7 @@ export class UIElementHelper {
     value: string,
   ): HTMLElement {
     return $(
-      `<span class="${id}-${side} ${id}-decimal-highlight">${
-        value || ""
+      `<span class="${id}-${side} ${id}-decimal-highlight">${value || ""
       }</span>`,
     )[0];
   }
@@ -35,10 +46,11 @@ export class UIElementHelper {
     )[0];
   }
 
-  public static getTextBoxElement(id: string): HTMLElement {
-    return $(
-      `<textarea id="${id}-text" name="${id}-text" class="${id}-text"></textarea>`,
-    )[0];
+  public static getTextBoxElement(id: string) {
+    return this.createElement<HTMLTextAreaElement>('textarea', [`${id}-text`], {
+      id: `${id}-text`,
+      name: `${id}-text`,
+    });
   }
 
   public static setUnitValue(

@@ -3,11 +3,11 @@ import { UIElementHelper } from "./ui.element.helper";
 
 export abstract class UIDom {
   public options: Readonly<FormulizeOptions>;
-  protected wrapper: JQuery;
-  protected container: JQuery;
-  protected statusBox: JQuery;
-  protected textBox: JQuery;
-  protected cursor: JQuery;
+  protected wrapper: HTMLElement;
+  protected container: HTMLDivElement;
+  protected statusBox: HTMLDivElement;
+  protected textBox: HTMLTextAreaElement;
+  protected cursor: HTMLDivElement;
   protected elem: HTMLElement;
 
   protected get cursorIndex(): number {
@@ -19,16 +19,13 @@ export abstract class UIDom {
   }
 
   protected initializeDOM() {
-    this.wrapper = $(this.elem);
-    this.wrapper.addClass(`${this.options.id}-wrapper`);
+    this.wrapper = this.elem
+    this.wrapper.classList.add(`${this.options.id}-wrapper`);
 
-    this.container = $(`<div class="${this.options.id}-container"></div>`);
-    this.container.appendTo(this.wrapper);
-
-    this.statusBox = $(
-      `<div class="${this.options.id}-alert">${this.options.text.formula}</div>`,
-    );
-    this.statusBox.insertBefore(this.container);
+    this.container = UIElementHelper.createElement("div", [`${this.options.id}-container`]);
+    this.statusBox = UIElementHelper.createElement("div", [`${this.options.id}-alert`]);
+    this.statusBox.textContent = this.options?.text?.formula ?? "";
+    this.container.prepend(this.statusBox);
 
     this.textBox = $(UIElementHelper.getTextBoxElement(this.options.id));
     this.textBox.insertAfter(this.container);

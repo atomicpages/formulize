@@ -3,7 +3,7 @@ import { UIBase } from "./ui.base";
 import type { Behavior } from "./ui.interface";
 
 export class UI extends UIBase {
-  protected analyzeKey<T>(
+  protected analyzeKey(
     keyCode: number,
     pressedCtrl: boolean,
     pressedShift: boolean,
