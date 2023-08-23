@@ -1,27 +1,7 @@
 {
-  "name": "formulize",
+  "name": "@djthoms/formulize",
   "version": "0.1.0",
   "description": "formula UI generator",
-  "main": "dist/formulize.umd.js",
-  "typings": "dist/types/formulize.d.ts",
-  "scripts": {
-    "prepare": "husky install",
-    "lint": "eslint 'src/**/*.{ts,js}'",
-    "lint:fix": "pnpm lint --fix",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts",
-    "build:sass": "sass style/formulize.scss style/formulize.css",
-    "typedoc": "typedoc --out docs --target es6 --theme minimal --mode file src --exclude **/*.spec.ts",
-    "pretest": "pnpm build:sass",
-    "test": "vitest --run",
-    "posttest": "rm style/*.css*"
-  },
-  "files": [
-    "dist"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/KennethanCeyer/formulize.git"
-  },
   "keywords": [
     "plugin",
     "formula",
@@ -33,12 +13,48 @@
     "jquery",
     "pignose"
   ],
-  "author": "PIGNOSE",
-  "license": "MIT",
+  "homepage": "https://github.com/KennethanCeyer/formulize#readme",
   "bugs": {
     "url": "https://github.com/KennethanCeyer/formulize/issues"
   },
-  "homepage": "https://github.com/KennethanCeyer/formulize#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KennethanCeyer/formulize.git"
+  },
+  "license": "MIT",
+  "author": "PIGNOSE",
+  "main": "./dist/cjs/formulize.js",
+  "module": "./dist/esm/formulize.js",
+  "types": "dist/types/formulize.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/formulize.d.ts",
+      "import": "./dist/esm/formulize.js",
+      "require": "./dist/cjs/formulize.js"
+    },
+    "./style": {
+      "import": "./dist/style/formulize.css",
+      "require": "./dist/style/formulize.css"
+    }
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "eslint 'src/**/*.{ts,js}'",
+    "lint:fix": "pnpm lint --fix",
+    "prebuild": "rm -rf dist",
+    "build": "npm-run-all -p build:*",
+    "build:cjs": "esbuild --sourcemap --outdir=dist/cjs --format=cjs --target=node18 `./scripts/fd.sh`",
+    "build:esm": "esbuild --sourcemap --outdir=dist/esm --format=esm --target=node18 `./scripts/fd.sh`",
+    "build:types": "tsc",
+    "build:sass": "sass style/formulize.scss dist/style/formulize.css",
+    "pretest": "pnpm build:sass",
+    "test": "vitest --run",
+    "posttest": "rm style/*.css*",
+    "check-types": "tsc --emitDeclarationOnly null --noEmit"
+  },
   "dependencies": {
     "metric-parser": "^0.0.12"
   },
@@ -50,6 +66,7 @@
     "@types/node": "^20.5.1",
     "@vitest/coverage-v8": "^0.34.2",
     "esbuild": "^0.19.2",
+    "fd-find": "^1.2.0",
     "husky": "^8.0.3",
     "jquery": "^3.7.0",
     "jsdom": "^22.1.0",

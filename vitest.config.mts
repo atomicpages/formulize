@@ -4,7 +4,10 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: true,
-      provider: 'v8',
+      reporter: ['text', 'text-summary', 'html'],
+    },
+    benchmark: {
+      reporters: ['verbose'],
     }
   },
 })
