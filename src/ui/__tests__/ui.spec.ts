@@ -1,36 +1,8 @@
-import { expect, describe, it, beforeEach } from "vitest";
-import { JSDOM } from "jsdom";
+import { expect, describe, it } from "vitest";
 import { UI } from "../ui";
-import { FormulizeGlobal } from "../../formulize.interface";
-import * as fs from "fs";
-import * as path from "path";
-
-declare const global: FormulizeGlobal;
 
 describe("test class: UI", () => {
   let elem: HTMLElement;
-
-  beforeEach(() => {
-    const style = fs
-      .readFileSync(path.join(__dirname, "../../../style/formulize.css"))
-      .toString();
-    const jsdom = new JSDOM(
-      `<!DOCTYPE HTML><html>
-                            <head><style>${style}</style></head>
-                            <body></body>
-                        </html>`,
-      { url: "http://localhost" },
-    );
-    (global as any).window = jsdom.window;
-    global.document = jsdom.window.document;
-    global.HTMLElement = jsdom.window.HTMLElement;
-    global.$ = require("jquery");
-    global.jQuery = $;
-
-    elem = document.createElement("div");
-    elem.style.width = "300px";
-    elem.style.height = "200px";
-  });
 
   describe("test method: new UI()", () => {
     it("should expected to work without exception", () => {
@@ -163,7 +135,9 @@ describe("test class: UI", () => {
       const ui = new UI(elem, {
         input: (value) => {
           streamIndex += 1;
-          if (streamIndex < 6) return;
+          if (streamIndex < 6) {
+            return;
+          }
 
           try {
             expect(value).to.be.deep.equal(data);
@@ -192,7 +166,9 @@ describe("test class: UI", () => {
 
       $(elem).on(`${ui.options.id}.input`, (_: JQuery.Event, value) => {
         streamIndex += 1;
-        if (streamIndex < 6) return;
+        if (streamIndex < 6) {
+          return;
+        }
 
         try {
           expect(value).to.be.deep.equal(data);

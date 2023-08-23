@@ -50,7 +50,10 @@ export class FormulizeKeyHelper {
     return action;
   }
 
-  public static getValue(keyCode: number, pressedShift = false): string {
+  public static getValue(
+    keyCode: number,
+    pressedShift = false,
+  ): string | undefined {
     if (keyCode === Key.Multiply) {
       return "x";
     }

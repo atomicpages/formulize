@@ -1,3 +1,6 @@
+/**
+ * @deprecated use `e.code` instead
+ */
 export enum Key {
   Backspace = 8,
   Tab = 9,

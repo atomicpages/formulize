@@ -1,13 +1,16 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    setupFiles: "./test-setup.ts",
+    environment: "jsdom",
     coverage: {
       enabled: true,
-      reporter: ['text', 'text-summary', 'html'],
+      reporter: ["text", "text-summary", "html"],
+      provider: "v8",
     },
     benchmark: {
-      reporters: ['verbose'],
-    }
+      reporters: ["verbose"],
+    },
   },
-})
+});

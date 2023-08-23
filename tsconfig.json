@@ -1,17 +1,13 @@
 {
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "moduleResolution": "NodeNext",
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM"],
-    "noImplicitThis": true,
-    "emitDeclarationOnly": true,
-    "strictNullChecks": true,
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "declarationDir": "dist/types",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "strictNullChecks": true
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "vitest.config.mts",
+    "test-setup.ts"
+  ]
 }

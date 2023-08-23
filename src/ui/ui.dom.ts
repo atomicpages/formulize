@@ -1,8 +1,9 @@
 import type { FormulizeOptions } from "../formulize.interface";
+import type { Nullable } from "../types";
 import { UIElementHelper } from "./ui.element.helper";
 
 export abstract class UIDom {
-  public options: Readonly<FormulizeOptions>;
+  public options: Readonly<Required<FormulizeOptions>>;
   protected wrapper: HTMLElement;
   protected container: HTMLDivElement;
   protected statusBox: HTMLDivElement;
@@ -19,43 +20,61 @@ export abstract class UIDom {
   }
 
   protected initializeDOM() {
-    this.wrapper = this.elem
+    this.wrapper = this.elem;
     this.wrapper.classList.add(`${this.options.id}-wrapper`);
 
-    this.container = UIElementHelper.createElement("div", [`${this.options.id}-container`]);
-    this.statusBox = UIElementHelper.createElement("div", [`${this.options.id}-alert`]);
+    this.container = UIElementHelper.createElement("div", [
+      `${this.options.id}-container`,
+    ]);
+
+    this.statusBox = UIElementHelper.createElement("div", [
+      `${this.options.id}-alert`,
+    ]);
+
     this.statusBox.textContent = this.options?.text?.formula ?? "";
     this.container.prepend(this.statusBox);
 
-    this.textBox = $(UIElementHelper.getTextBoxElement(this.options.id));
-    this.textBox.insertAfter(this.container);
-    this.textBox.trigger("focus");
+    this.textBox = UIElementHelper.getTextBoxElement(this.options.id);
+    this.container.insertAdjacentElement("afterend", this.textBox);
+    this.textBox.focus();
   }
 
   protected bindingDOM() {
-    this.wrapper = $(this.elem);
-    this.container = this.wrapper.find(`.${this.options.id}-container`);
-    this.statusBox = this.wrapper.find(`.${this.options.id}-alert`);
-    this.textBox = this.wrapper.find(`.${this.options.id}-text`);
+    this.wrapper = this.elem;
+
+    this.container = this.wrapper.querySelector(
+      `.${this.options.id}-container`,
+    );
+
+    this.statusBox = this.wrapper.querySelector(`.${this.options.id}-alert`);
+    this.textBox = this.wrapper.querySelector(`.${this.options.id}-text`);
   }
 
   protected isAlreadyInitialized(): boolean {
-    return $(this.elem).hasClass(`${this.options.id}-wrapper`);
+    return this.elem.classList.contains(`${this.options.id}-wrapper`);
   }
 
   protected attachEvents() {
     throw new Error("method not implemented");
   }
 
-  protected getPrevUnit(elem: HTMLElement): HTMLElement {
-    const prevElement = $(elem).prev();
-    return UIElementHelper.isCursor(this.options.id, prevElement.get(0))
-      ? prevElement.prev().get(0)
-      : prevElement.get(0);
+  protected getPrevUnit(elem: HTMLElement): Nullable<Element> {
+    const prevElement = elem.previousElementSibling as HTMLElement;
+
+    if (prevElement?.children.length === 0) {
+      return null;
+    }
+
+    return UIElementHelper.isCursor(
+      this.options.id,
+      prevElement.children.item(0) as HTMLElement,
+    )
+      ? prevElement.previousElementSibling?.children.item(0)
+      : prevElement.children.item(0);
   }
 
   protected getNextUnit(elem: HTMLElement): HTMLElement {
-    const nextElem = $(elem).next();
+    const nextElem = elem.nextElementSibling as HTMLElement;
     return UIElementHelper.isCursor(this.options.id, nextElem.get(0))
       ? nextElem.next().get(0)
       : nextElem.get(0);

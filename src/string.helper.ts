@@ -4,6 +4,6 @@ export class StringHelper {
   }
 
   public static toNumber(value: string): string {
-    return value.replace(/[^\d-\.]/g, "");
+    return value.replace(/[^\d-.]/g, "");
   }
 }

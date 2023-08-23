@@ -1,53 +1,69 @@
 import { FormulizeTokenHelper } from "../token.helper";
 
 export class UIElementHelper {
-  public static createElement<T extends HTMLElement>(name: keyof HTMLElementTagNameMap, classes: string[], attrs?: Record<string, string>) {
+  public static createElement<K extends keyof HTMLElementTagNameMap>(
+    name: K,
+    classes: string[],
+    attrs?: Record<string, string>,
+    content?: string,
+  ) {
     const elem = document.createElement(name);
 
     elem.classList.add(...classes);
 
     if (attrs) {
-      Object.entries(attrs).forEach(([key, value]) => elem.setAttribute(key, value));
+      Object.entries(attrs).forEach(([key, value]) =>
+        elem.setAttribute(key, value),
+      );
     }
 
-    return elem as T;
+    if (content) {
+      elem.textContent = content;
+    }
+
+    return elem;
   }
 
-  public static getDragElement(id: string): HTMLElement {
-    return $(`<div class="${id}-drag"></div>`)[0];
+  public static getDragElement(id: string) {
+    return this.createElement("div", [`${id}-drag`]);
   }
 
-  public static getCursorElement(id: string): HTMLElement {
-    return $(`<div class="${id}-cursor"></div>`)[0];
+  public static getCursorElement(id: string) {
+    return this.createElement("div", [`${id}-cursor`]);
   }
 
   public static getUnitElement(id: string, value?: string): HTMLElement {
-    const unitElem = $(`<div class="${id}-item ${id}-unit"></div>`);
-    UIElementHelper.setUnitValue(id, unitElem[0], value);
-    return unitElem[0];
+    const unitElem = this.createElement("div", [`${id}-item`, `${id}-unit`]);
+
+    this.setUnitValue(id, unitElem, value);
+
+    return unitElem;
   }
 
   public static getUnitDecimalElement(
     id: string,
     side: "prefix" | "suffix",
-    value: string,
-  ): HTMLElement {
-    return $(
-      `<span class="${id}-${side} ${id}-decimal-highlight">${value || ""
-      }</span>`,
-    )[0];
+    value?: string,
+  ) {
+    return this.createElement(
+      "span",
+      [`${id}-${side}`, `${id}-decimal-highlight`],
+      undefined,
+      value,
+    );
   }
 
-  public static getOperatorElement(id: string, value: string): HTMLElement {
-    return $(
-      `<div class="${id}-item ${id}-operator">${(
-        value || ""
-      ).toLowerCase()}</div>`,
-    )[0];
+  public static getOperatorElement(id: string, value?: string) {
+    return this.createElement(
+      "div",
+      [`${id}-item`, `${id}-operator`],
+      undefined,
+      (value ?? "").toLowerCase(),
+    );
   }
 
   public static getTextBoxElement(id: string) {
-    return this.createElement<HTMLTextAreaElement>('textarea', [`${id}-text`], {
+    return this.createElement("textarea", [`${id}-text`], {
       id: `${id}-text`,
       name: `${id}-text`,
     });
@@ -62,45 +78,44 @@ export class UIElementHelper {
       return;
     }
 
-    $(elem).empty();
-    const decimalValue = FormulizeTokenHelper.toDecimal(value);
-    const split = decimalValue.split(".");
-    const prefix = $(
-      UIElementHelper.getUnitDecimalElement(id, "prefix", split[0]),
-    );
-    prefix.appendTo($(elem));
+    // reset content of element
+    elem.innerHTML = "";
 
-    if (split[1] === undefined) {
-      return;
+    const decimalValue = FormulizeTokenHelper.toDecimal(value);
+    const [left, right] = decimalValue.split(".");
+
+    if (left !== undefined) {
+      const prefix = this.getUnitDecimalElement(id, "prefix", left);
+      elem.appendChild(prefix);
     }
 
-    const suffix = $(
-      UIElementHelper.getUnitDecimalElement(id, "suffix", `.${split[1]}`),
-    );
-    suffix.appendTo($(elem));
+    if (right !== undefined) {
+      const suffix = this.getUnitDecimalElement(id, "suffix", `.${right}`);
+      elem.appendChild(suffix);
+    }
   }
 
   public static isElementType(
     id: string,
     type: string,
-    elem: HTMLElement,
+    elem?: HTMLElement,
   ): boolean {
-    return elem ? $(elem).hasClass(`${id}-${type}`) : false;
+    return elem ? elem.classList.contains(`${id}-${type}`) : false;
   }
 
   public static isDrag(id: string, elem: HTMLElement): boolean {
-    return UIElementHelper.isElementType(id, "drag", elem);
+    return this.isElementType(id, "drag", elem);
   }
 
   public static isCursor(id: string, elem: HTMLElement): boolean {
-    return UIElementHelper.isElementType(id, "cursor", elem);
+    return this.isElementType(id, "cursor", elem);
   }
 
   public static isUnit(id: string, elem: HTMLElement): boolean {
-    return UIElementHelper.isElementType(id, "unit", elem);
+    return this.isElementType(id, "unit", elem);
   }
 
   public static isOperator(id: string, elem: HTMLElement): boolean {
-    return UIElementHelper.isElementType(id, "operator", elem);
+    return this.isElementType(id, "operator", elem);
   }
 }
