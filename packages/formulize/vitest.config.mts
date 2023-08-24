@@ -8,6 +8,7 @@ export default defineConfig({
       enabled: true,
       reporter: ["text", "text-summary", "html"],
       provider: "v8",
+      reportsDirectory: "./coverage",
     },
     benchmark: {
       reporters: ["verbose"],

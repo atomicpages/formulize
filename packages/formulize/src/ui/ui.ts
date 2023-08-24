@@ -58,6 +58,7 @@ export class UI extends UIBase {
         ),
       },
     ];
+
     const behavior = behaviors.find((behavior) =>
       behavior.predicate(keyCode, pressedCtrl, pressedShift),
     );

@@ -10,13 +10,14 @@ export abstract class UIDom {
   protected textBox: HTMLTextAreaElement;
   protected cursor: HTMLDivElement;
   protected elem: HTMLElement;
+  private initialized = false;
 
   protected get cursorIndex(): number {
     return this.cursor ? this.cursor.index() : 0;
   }
 
-  protected get dragElem(): JQuery {
-    return this.container.find(`.${this.options.id}-drag`);
+  protected get dragElem() {
+    return this.container.querySelector(`.${this.options.id}-drag`);
   }
 
   protected initializeDOM() {
@@ -37,6 +38,7 @@ export abstract class UIDom {
     this.textBox = UIElementHelper.getTextBoxElement(this.options.id);
     this.container.insertAdjacentElement("afterend", this.textBox);
     this.textBox.focus();
+    this.initialized = true;
   }
 
   protected bindingDOM() {
@@ -51,6 +53,10 @@ export abstract class UIDom {
   }
 
   protected isAlreadyInitialized(): boolean {
+    if (this.initialized === true) {
+      return this.initialized;
+    }
+
     return this.elem.classList.contains(`${this.options.id}-wrapper`);
   }
 
