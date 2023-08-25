@@ -1,6 +1,7 @@
 import { FormulizeKeyHelper } from "../key.helper";
 import { UIBase } from "./ui.base";
 import type { Behavior } from "./ui.interface";
+import { UIEvent } from "./ui.event";
 
 export class UI extends UIBase {
   protected analyzeKey(
@@ -72,34 +73,25 @@ export class UI extends UIBase {
   }
 
   protected attachEvents(): void {
-    this.textBox.off("blur").on("blur", () => this.blur());
+    const blur = () => this.blur();
+    const selectAll = (e: MouseEvent) => this.selectAll(e);
+    const mouseDown = (e: MouseEvent) =>
+      this.startDrag({ x: e.offsetX, y: e.offsetY });
+    const mouseUp = (e: MouseEvent) =>
+      this.endDrag({ x: e.offsetX, y: e.offsetY });
 
-    this.textBox
-      .off(`dblclick.${this.options.id}Handler`)
-      .on(`dblclick.${this.options.id}Handler`, this.selectAll);
+    const mouseMove = (e: MouseEvent) =>
+      this.moveDrag({ x: e.offsetX, y: e.offsetY });
 
-    this.textBox
-      .off(`mousedown.${this.options.id}Handler`)
-      .on(`mousedown.${this.options.id}Handler`, (event) =>
-        this.startDrag({ x: event.offsetX, y: event.offsetY }),
-      );
+    const keyDown = (event: KeyboardEvent) => {
+      this.hookKeyDown(event);
+    };
 
-    this.textBox
-      .off(`mouseup.${this.options.id}Handler`)
-      .on(`mouseup.${this.options.id}Handler`, (event) =>
-        this.endDrag({ x: event.offsetX, y: event.offsetY }),
-      );
-
-    this.textBox
-      .off(`mousemove.${this.options.id}Handler`)
-      .on(`mousemove.${this.options.id}Handler`, (event) =>
-        this.moveDrag({ x: event.offsetX, y: event.offsetY }),
-      );
-
-    this.textBox
-      .off(`keydown.${this.options.id}Handler`)
-      .on(`keydown.${this.options.id}Handler`, (event: any) => {
-        this.hookKeyDown(event);
-      });
+    UIEvent.on(this.textBox, "blur", blur);
+    UIEvent.on(this.textBox, "dblclick", selectAll);
+    UIEvent.on(this.textBox, "mousedown", mouseDown);
+    UIEvent.on(this.textBox, "mouseup", mouseUp);
+    UIEvent.on(this.textBox, "mousemove", mouseMove);
+    UIEvent.on(this.textBox, "keydown", keyDown);
   }
 }

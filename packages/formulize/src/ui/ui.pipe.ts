@@ -1,8 +1,8 @@
-import { UIAnalyzer } from "./ui.analyzer";
 import type { FormulizeData, FormulizeEvent } from "./ui.interface";
 import { UIHelper } from "./ui.helper";
+import { UIDom } from "./ui.dom";
 
-export class UIPipe extends UIAnalyzer {
+export class UIPipe extends UIDom {
   protected pipeInsert(data: FormulizeData): any {
     if (!this.options.pipe?.insert) {
       return data;
