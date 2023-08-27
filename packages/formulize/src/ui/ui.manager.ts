@@ -14,14 +14,16 @@ export abstract class UIManager extends UIPipe {
 
   public pick(position: Position = { x: 0, y: 0 }) {
     this.removeCursor();
-    this.cursor = $(UIElementHelper.getCursorElement(this.options.id));
-    this.cursor.appendTo(this.container);
+
+    this.cursor = UIElementHelper.createCursorElement(this.options.id);
+    this.container.append(this.cursor);
 
     const closestUnitElem = this.findClosestUnit(position);
+
     if (closestUnitElem) {
-      this.cursor.insertAfter(closestUnitElem);
+      closestUnitElem.append(this.cursor);
     } else {
-      this.cursor.prependTo(this.container);
+      this.container.prepend(this.cursor);
     }
 
     this.removeDrag();
@@ -30,6 +32,7 @@ export abstract class UIManager extends UIPipe {
   public setData(data: Tree): void {
     this.clear();
     const result = convert(data);
+
     if (!result.code) {
       this.insertData(result.data);
     }
@@ -52,11 +55,9 @@ export abstract class UIManager extends UIPipe {
   }
 
   private getExpression(): FormulizeData[] {
-    return this.container
-      .find(`.${this.options.id}-item`)
-      .toArray()
-      .map((elem) => this.pipeParse(elem))
-      .map((value) => UIHelper.getDataValue(value));
+    return Array.from(
+      this.container.querySelectorAll(`.${this.options.id}-item`),
+    ).map((elem: HTMLElement) => UIHelper.getDataValue(this.pipeParse(elem)));
   }
 
   protected startDrag(position: Position): void {
@@ -98,25 +99,29 @@ export abstract class UIManager extends UIPipe {
     const positions = [this.prevCursorIndex, this.cursorIndex];
     positions.sort();
 
-    const dragElem = $(UIElementHelper.getDragElement(this.options.id));
+    const dragElem = UIElementHelper.createDragElement(this.options.id);
+
     if (this.cursorIndex >= this.prevCursorIndex) {
-      dragElem.insertBefore(this.cursor);
+      this.cursor.insertAdjacentElement("afterbegin", dragElem);
     } else {
-      dragElem.insertAfter(this.cursor);
+      this.cursor.insertAdjacentElement("afterend", dragElem);
     }
 
     this.selectRange(positions[0], positions[1]);
   }
 
   private findClosestUnit(position: Position): HTMLElement {
-    const unitPositions: ElementPosition[] = this.container
-      .children(`*:not(".${this.options.id}-cursor")`)
-      .toArray()
-      .map((elem) => ({
+    const unitPositions: ElementPosition[] = Array.from(
+      this.container.querySelectorAll(`*:not(.${this.options.id}-cursor)`),
+    ).map((elem) => {
+      const { left, top, width } = elem.getBoundingClientRect();
+
+      return {
         elem,
-        x: $(elem).position().left + $(elem).outerWidth(),
-        y: $(elem).position().top,
-      }));
+        x: left + width,
+        y: top,
+      };
+    });
 
     const closestUnitPositions = unitPositions
       .filter(
@@ -126,15 +131,18 @@ export abstract class UIManager extends UIPipe {
       .map((unitPosition) => {
         const diffX = Math.abs(position.x - unitPosition.x);
         const diffY = Math.abs(position.y - unitPosition.y);
+
         return {
           ...unitPosition,
           diff: { x: diffX, y: diffY },
         };
       })
       .filter((unitPosition) => unitPosition);
+
     const maxY = Math.max(
       ...closestUnitPositions.map((unitPosition) => unitPosition.y),
     );
+
     const filteredUnitPositions = closestUnitPositions.filter(
       (unitPosition) => unitPosition.y === maxY,
     ).length
@@ -142,6 +150,7 @@ export abstract class UIManager extends UIPipe {
       : closestUnitPositions.filter(
           (unitPosition) => unitPosition.y <= position.y,
         );
+
     filteredUnitPositions.sort(
       (a, b) => a.diff.x - b.diff.x || a.diff.y - b.diff.y,
     );
@@ -153,8 +162,11 @@ export abstract class UIManager extends UIPipe {
 
   public selectAll(): void {
     this.removeDrag();
-    const dragElem = $(UIElementHelper.getDragElement(this.options.id));
-    dragElem.prependTo(this.container);
+    const dragElem = UIElementHelper.createDragElement(this.options.id);
+    this.container.prepend(dragElem);
+
+    // TODO: figure out if this children can return an array
+    // and if prependTo can receive an array
     this.container
       .children(`:not(".${this.options.id}-cursor")`)
       .appendTo(dragElem);
@@ -176,26 +188,28 @@ export abstract class UIManager extends UIPipe {
   }
 
   protected removeBefore(): void {
-    if (this.dragElem.length) {
-      this.cursor.insertBefore(this.dragElem);
+    if (this.dragElem) {
+      this.dragElem.before(this.cursor);
       this.dragElem.remove();
       this.triggerUpdate();
       return;
     }
 
-    const prevCursorElem = this.cursor.prev();
-    if (!this.cursor.length || !prevCursorElem.length) {
+    const prevCursorElem = this.cursor.previousElementSibling as HTMLElement;
+
+    if (!this.cursor || !prevCursorElem) {
       return;
     }
 
     if (
-      prevCursorElem.hasClass(`${this.options.id}-unit`) &&
-      prevCursorElem.text().length > 1
+      prevCursorElem.classList.contains(`${this.options.id}-unit`) &&
+      prevCursorElem.textContent
     ) {
-      const text = prevCursorElem.text();
+      const text = prevCursorElem.textContent;
+
       UIElementHelper.setUnitValue(
         this.options.id,
-        prevCursorElem.get(0),
+        prevCursorElem,
         text.substring(0, text.length - 1),
       );
     } else {
@@ -206,26 +220,27 @@ export abstract class UIManager extends UIPipe {
   }
 
   protected removeAfter(): void {
-    if (this.dragElem.length) {
-      this.cursor.insertAfter(this.dragElem);
+    if (this.dragElem) {
+      this.dragElem.after(this.cursor);
       this.dragElem.remove();
       this.triggerUpdate();
       return;
     }
 
-    const nextCursorElem = this.cursor.next();
-    if (!this.cursor.length || !nextCursorElem.length) {
+    const nextCursorElem = this.cursor.nextElementSibling as HTMLElement;
+    if (!this.cursor || !nextCursorElem) {
       return;
     }
 
     if (
-      nextCursorElem.hasClass(`${this.options.id}-unit`) &&
-      nextCursorElem.text().length > 1
+      nextCursorElem.classList.contains(`${this.options.id}-unit`) &&
+      nextCursorElem.textContent
     ) {
-      const text = nextCursorElem.text();
+      const text = nextCursorElem.textContent;
+
       UIElementHelper.setUnitValue(
         this.options.id,
-        nextCursorElem.get(0),
+        nextCursorElem,
         text.substring(1, text.length),
       );
     } else {
@@ -236,17 +251,34 @@ export abstract class UIManager extends UIPipe {
   }
 
   protected dragFirst(): void {
-    this.cursor.prevAll().prependTo(this.dragElem);
-    this.cursor.insertAfter(this.dragElem);
+    if (this.dragElem) {
+      UIElementHelper.prependTo(
+        this.dragElem as HTMLElement,
+        UIElementHelper.prevAll(this.cursor),
+      );
+
+      this.cursor.after(this.dragElem);
+    }
   }
 
   protected dragLast(): void {
-    this.cursor.nextAll().appendTo(this.dragElem);
-    this.cursor.insertBefore(this.dragElem);
+    if (this.dragElem) {
+      UIElementHelper.appendTo(
+        this.dragElem,
+        UIElementHelper.nextAll(this.cursor),
+      );
+
+      this.dragElem.before(this.cursor);
+    }
   }
 
   protected dragLeft(): void {
-    if (UIElementHelper.isDrag(this.options.id, this.cursor.prev().get(0))) {
+    if (
+      UIElementHelper.isDrag(
+        this.options.id,
+        this.cursor.previousElementSibling as HTMLElement,
+      )
+    ) {
       this.dragElem.prev().prependTo(this.dragElem);
       this.moveCursorAfter(this.dragElem.get(0));
       return;
@@ -284,38 +316,40 @@ export abstract class UIManager extends UIPipe {
   }
 
   private moveCursorBefore(elem: HTMLElement) {
-    if (!$(elem).length) {
+    if (!elem) {
       return;
     }
 
-    this.cursor.insertBefore($(elem));
+    elem.before(this.cursor);
   }
 
   private moveCursorAfter(elem: HTMLElement) {
-    if (!$(elem).length) {
+    if (!elem) {
       return;
     }
 
-    this.cursor.insertAfter($(elem));
+    elem.after(this.cursor);
   }
 
   protected moveLeftCursor(dragMode = false): void {
-    const prevCursorElem = this.cursor.prev();
+    const prevCursorElem = this.cursor.previousElementSibling as HTMLElement;
 
-    if (!this.cursor.length || !dragMode) {
-      this.moveCursorBefore(prevCursorElem.get(0));
+    if (prevCursorElem && (!this.cursor || !dragMode)) {
+      this.moveCursorBefore(prevCursorElem);
       this.removeDrag();
       return;
     }
 
-    if (!this.dragElem.length) {
-      if (!prevCursorElem.length) {
+    if (!this.dragElem) {
+      if (!prevCursorElem) {
         return;
       }
 
-      const dragElem = $(UIElementHelper.getDragElement(this.options.id));
-      dragElem.insertBefore(this.cursor);
-      prevCursorElem.prependTo(this.dragElem);
+      const dragElem = UIElementHelper.createDragElement(this.options.id);
+      this.cursor.before(dragElem);
+
+      // TODO: fix this
+      UIElementHelper.prependTo(this.dragElem, prevCursorElem);
       return;
     }
 
@@ -323,33 +357,35 @@ export abstract class UIManager extends UIPipe {
   }
 
   protected moveUpCursor(): void {
-    if (!this.cursor.length) {
+    if (!this.cursor) {
       return;
     }
 
+    const { left, top, width, height } = this.cursor.getBoundingClientRect();
+
     this.pick({
-      x: this.cursor.position().left + this.cursor.outerWidth(),
-      y: this.cursor.position().top - this.cursor.outerHeight() / 2,
+      x: left + width,
+      y: top - height / 2,
     });
   }
 
   protected moveRightCursor(dragMode = false): void {
-    const nextCursorElem = this.cursor.next();
+    const nextCursorElem = this.cursor.nextElementSibling as HTMLElement;
 
-    if (!this.cursor.length || !dragMode) {
-      this.moveCursorAfter(nextCursorElem.get(0));
+    if (!this.cursor || !dragMode) {
+      this.moveCursorAfter(nextCursorElem);
       this.removeDrag();
       return;
     }
 
-    if (!this.dragElem.length) {
-      if (!nextCursorElem.length) {
+    if (!this.dragElem) {
+      if (!nextCursorElem) {
         return;
       }
 
-      const dragElem = $(UIElementHelper.getDragElement(this.options.id));
-      dragElem.insertAfter(this.cursor);
-      nextCursorElem.appendTo(this.dragElem);
+      const dragElem = UIElementHelper.createDragElement(this.options.id);
+      this.cursor.after(dragElem);
+      UIElementHelper.appendTo(this.dragElem, nextCursorElem);
       return;
     }
 
@@ -357,43 +393,47 @@ export abstract class UIManager extends UIPipe {
   }
 
   protected moveDownCursor(): void {
-    if (!this.cursor.length) {
+    if (!this.cursor) {
       return;
     }
 
+    const { left, top, width, height } = this.cursor.getBoundingClientRect();
+
     this.pick({
-      x: this.cursor.position().left + this.cursor.outerWidth(),
-      y: this.cursor.position().top + this.cursor.outerHeight() * 1.5,
+      x: left + width,
+      y: top + height * 1.5,
     });
   }
 
   protected moveFirstCursor(dragMode = false): void {
-    const firstCursorElem = this.container.children(":first");
-    if (!this.cursor.length || !firstCursorElem.length || !dragMode) {
+    const firstCursorElem = this.container.firstElementChild as HTMLElement;
+
+    if (!this.cursor || !firstCursorElem || !dragMode) {
       this.removeDrag();
-      this.moveCursorBefore(firstCursorElem.get(0));
+      this.moveCursorBefore(firstCursorElem);
       return;
     }
 
-    if (!this.dragElem.length) {
-      const dragElem = $(UIElementHelper.getDragElement(this.options.id));
-      dragElem.insertAfter(this.cursor);
+    if (!this.dragElem) {
+      const dragElem = UIElementHelper.createDragElement(this.options.id);
+      this.cursor.after(dragElem);
     }
 
     this.dragFirst();
   }
 
   protected moveLastCursor(dragMode = false): void {
-    const lastCursorElem = this.container.children(":last");
-    if (!this.cursor.length || !lastCursorElem.length || !dragMode) {
+    const lastCursorElem = this.container.lastElementChild as HTMLElement;
+
+    if (!this.cursor || !lastCursorElem || !dragMode) {
       this.removeDrag();
-      this.moveCursorAfter(lastCursorElem.get(0));
+      this.moveCursorAfter(lastCursorElem);
       return;
     }
 
-    if (!this.dragElem.length) {
-      const dragElem = $(UIElementHelper.getDragElement(this.options.id));
-      dragElem.insertBefore(this.cursor);
+    if (!this.dragElem) {
+      const dragElem = UIElementHelper.createDragElement(this.options.id);
+      this.cursor.before(dragElem);
     }
 
     this.dragLast();
@@ -415,9 +455,11 @@ export abstract class UIManager extends UIPipe {
   }
 
   public removeDrag(): void {
-    this.dragElem.children().insertBefore(this.dragElem);
-    this.dragElem.remove();
-    this.triggerUpdate();
+    if (this.dragElem) {
+      this.dragElem.children().insertBefore(this.dragElem);
+      this.dragElem.remove();
+      this.triggerUpdate();
+    }
   }
 
   public insert(data: FormulizeData, position?: Position): void {
@@ -453,38 +495,41 @@ export abstract class UIManager extends UIPipe {
     }
 
     if (FormulizeTokenHelper.isNumeric(value)) {
-      const unitElem = $(
-        UIElementHelper.getUnitElement(this.options.id, value),
+      const unitElem = UIElementHelper.createUnitElement(
+        this.options.id,
+        value,
       );
 
-      if (this.dragElem.length) {
-        this.cursor.insertBefore(this.dragElem);
+      if (this.dragElem) {
+        this.cursor.before(this.dragElem);
         this.dragElem.remove();
       }
 
-      if (this.cursor && this.cursor.length) {
+      if (this.cursor) {
         this.cursor.before(unitElem);
       } else {
         this.container.append(unitElem);
       }
 
-      this.mergeUnit(unitElem[0]);
+      this.mergeUnit(unitElem);
 
       this.triggerUpdate();
       return;
     }
 
-    const operatorElem = $(
-      UIElementHelper.getOperatorElement(this.options.id, value),
+    const operatorElem = UIElementHelper.createOperatorElement(
+      this.options.id,
+      value,
     );
-    if (this.cursor && this.cursor.length) {
+
+    if (this.cursor) {
       this.cursor.before(operatorElem);
     } else {
       this.container.append(operatorElem);
     }
 
     if (FormulizeTokenHelper.isBracket(value)) {
-      operatorElem.addClass(`${this.options.id}-bracket`);
+      operatorElem.classList.add(`${this.options.id}-bracket`);
     }
   }
 
@@ -495,7 +540,7 @@ export abstract class UIManager extends UIPipe {
     this.triggerUpdate();
   }
 
-  public validate(extractor?: (valid: boolean) => void): boolean {
+  public validate(extractor?: (valid: boolean) => void): boolean | undefined {
     const data = this.getData();
 
     if (!data) {

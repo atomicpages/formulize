@@ -16,6 +16,6 @@ export type Behavior = {
   doBehavior: () => any;
 };
 
-export type FormulizeData = string | number | HTMLElement | JQuery | any;
+export type FormulizeData = string | number | HTMLElement;
 
 export type FormulizeEvent = "input";

@@ -29,7 +29,7 @@ export class UIHelper {
   }
 
   public static isDOM(data: FormulizeData): boolean {
-    return data instanceof HTMLElement || data instanceof jQuery;
+    return data instanceof HTMLElement;
   }
 
   public static getDOM(elem: HTMLElement | JQuery): HTMLElement {

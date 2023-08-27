@@ -5,9 +5,10 @@ import { UIEvent } from "./ui.event";
 
 export class UI extends UIBase {
   protected analyzeKey(
-    keyCode: number,
-    pressedCtrl: boolean,
-    pressedShift: boolean,
+    key: string,
+    ctrl: boolean,
+    shift: boolean,
+    meta: boolean,
   ): boolean {
     const behaviors: Behavior[] = [
       {
@@ -29,7 +30,7 @@ export class UI extends UIBase {
       {
         predicate: FormulizeKeyHelper.isLeft,
         doBehavior: FormulizeKeyHelper.doAction(() =>
-          this.moveLeftCursor(pressedShift),
+          this.moveLeftCursor(shift),
         ),
       },
       {
@@ -39,7 +40,7 @@ export class UI extends UIBase {
       {
         predicate: FormulizeKeyHelper.isRight,
         doBehavior: FormulizeKeyHelper.doAction(() =>
-          this.moveRightCursor(pressedShift),
+          this.moveRightCursor(shift),
         ),
       },
       {
@@ -49,19 +50,19 @@ export class UI extends UIBase {
       {
         predicate: FormulizeKeyHelper.isHome,
         doBehavior: FormulizeKeyHelper.doAction(() =>
-          this.moveFirstCursor(pressedShift),
+          this.moveFirstCursor(shift),
         ),
       },
       {
         predicate: FormulizeKeyHelper.isEnd,
         doBehavior: FormulizeKeyHelper.doAction(() =>
-          this.moveLastCursor(pressedShift),
+          this.moveLastCursor(shift),
         ),
       },
     ];
 
     const behavior = behaviors.find((behavior) =>
-      behavior.predicate(keyCode, pressedCtrl, pressedShift),
+      behavior.predicate(key, ctrl, shift, meta),
     );
 
     if (!behavior) {
@@ -74,9 +75,11 @@ export class UI extends UIBase {
 
   protected attachEvents(): void {
     const blur = () => this.blur();
-    const selectAll = (e: MouseEvent) => this.selectAll(e);
+    const selectAll = () => this.selectAll();
+
     const mouseDown = (e: MouseEvent) =>
       this.startDrag({ x: e.offsetX, y: e.offsetY });
+
     const mouseUp = (e: MouseEvent) =>
       this.endDrag({ x: e.offsetX, y: e.offsetY });
 

@@ -13,3 +13,20 @@ html {
 body {
   @apply m-6;
 }
+
+.formulize-wrapper {
+  position: relative;
+}
+
+.formulize-wrapper .formulize-text {
+  opacity: 0;
+  color: transparent;
+  position: absolute;
+  font-size: 0;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  text-indent: -10000px;
+  z-index: 20;
+}

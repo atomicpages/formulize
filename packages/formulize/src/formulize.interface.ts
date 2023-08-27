@@ -24,6 +24,7 @@ export type FormulizeOptions = {
   id?: string;
   text?: OptionText;
   pipe?: OptionPipe;
+  status?: boolean;
 } & FormulizeEventOptions;
 
 export type FormulizeEventOptions = {

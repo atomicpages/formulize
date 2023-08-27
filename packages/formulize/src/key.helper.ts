@@ -1,45 +1,66 @@
-import { Key } from "./key.enum";
-import { specialCharacters } from "./values";
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
+import { KeyCodes } from "./key.enum";
+import { specialCharacters, supportedCharacters } from "./values";
+
+const numberRe = /^[0-9]+/;
 
 export class FormulizeKeyHelper {
-  public static isReload(keyCode: number, pressedCtrl: boolean): boolean {
-    return keyCode === Key.F5 || (pressedCtrl && keyCode === Key.R);
+  private static isMacOS() {
+    return navigator.userAgent.includes("Mac OS X");
   }
 
-  public static isSelectAll(keyCode: number, pressedCtrl: boolean): boolean {
-    return keyCode === Key.A && pressedCtrl;
+  public static isReload(
+    key: string,
+    ctrl: boolean,
+    shift?: boolean,
+    meta?: boolean,
+  ): boolean {
+    if (this.isMacOS()) {
+      return Boolean(shift && meta && key === "r");
+    }
+
+    return key === "F5" || (ctrl && key === "r");
   }
 
-  public static isBackspace(keyCode: number): boolean {
-    return keyCode === Key.Backspace;
+  public static isSelectAll(
+    key: string,
+    ctrl: boolean,
+    shift?: boolean,
+    meta?: boolean,
+  ): boolean {
+    return Boolean(this.isMacOS() ? meta && key === "a" : key === "a" && ctrl);
   }
 
-  public static isDelete(keyCode: number): boolean {
-    return keyCode === Key.Delete;
+  public static isBackspace(key: string): boolean {
+    return key === KeyCodes.Backspace;
   }
 
-  public static isLeft(keyCode: number): boolean {
-    return keyCode === Key.LeftArrow;
+  public static isDelete(key: string): boolean {
+    return key === KeyCodes.Delete;
   }
 
-  public static isUp(keyCode: number): boolean {
-    return keyCode === Key.UpArrow;
+  public static isLeft(key: string): boolean {
+    return key === KeyCodes.LeftArrow;
   }
 
-  public static isRight(keyCode: number): boolean {
-    return keyCode === Key.RightArrow;
+  public static isUp(key: string): boolean {
+    return key === KeyCodes.UpArrow;
   }
 
-  public static isDown(keyCode: number): boolean {
-    return keyCode === Key.DownArrow;
+  public static isRight(key: string): boolean {
+    return key === KeyCodes.RightArrow;
   }
 
-  public static isHome(keyCode: number): boolean {
-    return keyCode === Key.Home;
+  public static isDown(key: string): boolean {
+    return key === KeyCodes.DownArrow;
   }
 
-  public static isEnd(keyCode: number): boolean {
-    return keyCode === Key.End;
+  public static isHome(key: string): boolean {
+    return key === KeyCodes.Home;
+  }
+
+  public static isEnd(key: string): boolean {
+    return key === KeyCodes.End;
   }
 
   public static doReload(): void {
@@ -50,43 +71,39 @@ export class FormulizeKeyHelper {
     return action;
   }
 
-  public static getValue(
-    keyCode: number,
-    pressedShift = false,
-  ): string | undefined {
-    if (keyCode === Key.Multiply) {
+  public static getValue(key: string, shift = false): string | undefined {
+    if (key === KeyCodes.Asterik) {
       return "x";
     }
 
     if (
-      ((keyCode === Key.PlusSign || keyCode === 61) && pressedShift) ||
-      keyCode === Key.Add
+      ((key === KeyCodes.PlusMinus || key === KeyCodes.Equals) && shift) ||
+      key === KeyCodes.Plus
     ) {
       return "+";
     }
 
-    if (keyCode === Key.Dash || keyCode === 173 || keyCode === Key.Subtract) {
+    if (key === KeyCodes.Subtract || key === KeyCodes.LongMinus) {
       return "-";
     }
 
-    if (keyCode === Key.Period || keyCode === Key.DecimalPoint) {
+    if (key === KeyCodes.Period) {
       return ".";
     }
 
-    if (keyCode === Key.ForwardSlash || keyCode === Key.Divide) {
+    if (key === KeyCodes.Divide || key === KeyCodes.DivideAlt) {
       return "/";
     }
 
-    const numberKeyCode =
-      keyCode >= Key.Numpad0 && keyCode <= Key.Numpad9
-        ? keyCode - (Key.Numpad0 - Key.Zero)
-        : keyCode;
+    const isNumber = numberRe.test(key);
 
-    if (numberKeyCode >= Key.Zero && numberKeyCode <= Key.Nine) {
-      const numberValue = String.fromCharCode(numberKeyCode);
-      return pressedShift
-        ? specialCharacters[Number(numberValue)]
-        : numberValue;
+    if (isNumber || supportedCharacters.includes(key)) {
+      if (isNumber && shift) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, security/detect-object-injection
+        return specialCharacters[key];
+      }
+
+      return key;
     }
 
     return undefined;

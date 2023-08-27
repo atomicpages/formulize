@@ -1,15 +1,16 @@
-export const specialCharacters = [
-  ")",
-  "!",
-  "@",
-  "#",
-  "$",
-  "%",
-  "^",
-  "&",
-  "x",
-  "(",
-];
+export const specialCharacters = {
+  "0": ")",
+  "1": "!",
+  "2": "@",
+  "3": "#",
+  "4": "$",
+  "5": "%",
+  "6": "^",
+  "7": "&",
+  "8": "x",
+  "9": "(",
+};
+
 export const supportedCharacters = [
   0,
   1,
@@ -21,7 +22,6 @@ export const supportedCharacters = [
   7,
   8,
   9,
-  0,
   "x",
   "*",
   "/",

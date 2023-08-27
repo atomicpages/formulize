@@ -1,26 +1,88 @@
-import { expect, describe, it, beforeEach, afterEach } from "vitest";
+import { expect, describe, it, beforeEach } from "vitest";
 import { UIElementHelper } from "../ui.element.helper";
 
 describe("test class: UIElementHelper", () => {
   const id = "formulize";
 
-  describe("test method: UIElementHelper.getDragElement()", () => {
+  describe("test method: UIElementHelper.createElement()", () => {
+    it("should create elements", () => {
+      const el = UIElementHelper.createElement(
+        "div",
+        ["a", "b"],
+        {
+          "data-testid": "foo",
+        },
+        "<p>Bar</p>",
+      );
+
+      expect(el.classList.contains("a")).toBeTruthy();
+      expect(el.classList.contains("b")).toBeTruthy();
+      expect(el.classList.contains("c")).toBeFalsy();
+      expect(el.getAttribute("data-testid")).toBe("foo");
+      expect(el.textContent).toBe("<p>Bar</p>");
+    });
+  });
+
+  describe("test method: UIElementHelper.createDragElement()", () => {
     it("should return a valid HTMLElement", () => {
-      const elem = UIElementHelper.getDragElement(id);
+      const elem = UIElementHelper.createDragElement(id);
       expect(elem.classList.contains(`${id}-drag`)).toBeTruthy();
     });
   });
 
-  describe("test method: UIElementHelper.getCursorElement()", () => {
+  describe("test method: UIElementHelper.prevAll()", () => {
+    it("should get all previous elements of the specified element", () => {
+      const parent = document.createElement("div");
+      parent.innerHTML = `<ul>
+      <li class="a">a</li>
+      <li class="b">b</li>
+      <li class="c">c</li>
+      <li class="d">d</li>
+      <li class="e">e</li>
+      </ul>`;
+
+      expect(UIElementHelper.prevAll(parent.querySelector(".b")!)).toHaveLength(
+        1,
+      );
+
+      expect(UIElementHelper.prevAll(parent.querySelector(".e")!)).toHaveLength(
+        4,
+      );
+
+      expect(UIElementHelper.prevAll(parent.querySelector(".a")!)).toHaveLength(
+        0,
+      );
+    });
+  });
+
+  describe("test method: UIElementHelper.index()", () => {
+    it("should get the index of the specified element", () => {
+      const parent = document.createElement("div");
+
+      parent.innerHTML = `<ul>
+      <li class="a">a</li>
+      <li class="b">b</li>
+      <li class="c">c</li>
+      <li class="d">d</li>
+      <li class="e">e</li>
+      </ul>`;
+
+      expect(UIElementHelper.index(parent.querySelector(".b"))).toBe(1);
+      expect(UIElementHelper.index(parent.querySelector(".d"))).toBe(3);
+      expect(UIElementHelper.index(parent.querySelector(".f"))).toBe(-1);
+    });
+  });
+
+  describe("test method: UIElementHelper.createCursorElement()", () => {
     it("should return a valid HTMLElement", () => {
-      const elem = UIElementHelper.getCursorElement(id);
+      const elem = UIElementHelper.createCursorElement(id);
       expect(elem.classList.contains(`${id}-cursor`)).toBeTruthy();
     });
   });
 
-  describe("test method: UIElementHelper.getUnitElement()", () => {
+  describe("test method: UIElementHelper.createUnitElement()", () => {
     it("should return an HTMLElement contained an empty child with empty value", () => {
-      const elem = UIElementHelper.getUnitElement(id, undefined);
+      const elem = UIElementHelper.createUnitElement(id, undefined);
 
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-unit`)).toBeTruthy();
@@ -28,7 +90,7 @@ describe("test class: UIElementHelper", () => {
     });
 
     it("should return an HTMLElement contained an child what contained empty child with +", () => {
-      const elem = UIElementHelper.getUnitElement(id, "+");
+      const elem = UIElementHelper.createUnitElement(id, "+");
 
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-unit`)).toBeTruthy();
@@ -44,7 +106,7 @@ describe("test class: UIElementHelper", () => {
     });
 
     it("should return an HTMLElement contained a prefix child child with 1", () => {
-      const elem = UIElementHelper.getUnitElement(id, "1");
+      const elem = UIElementHelper.createUnitElement(id, "1");
 
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-unit`)).toBeTruthy();
@@ -60,7 +122,7 @@ describe("test class: UIElementHelper", () => {
     });
 
     it("should return an HTMLElement contained a prefix child child with 1000", () => {
-      const elem = UIElementHelper.getUnitElement(id, "1000");
+      const elem = UIElementHelper.createUnitElement(id, "1000");
 
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-unit`)).toBeTruthy();
@@ -76,7 +138,7 @@ describe("test class: UIElementHelper", () => {
     });
 
     it("should return an HTMLElement contained a prefix child child with 1000.1", () => {
-      const elem = UIElementHelper.getUnitElement(id, "1000.1");
+      const elem = UIElementHelper.createUnitElement(id, "1000.1");
 
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-unit`)).toBeTruthy();
@@ -99,9 +161,9 @@ describe("test class: UIElementHelper", () => {
     });
   });
 
-  describe("test method: UIElementHelper.getUnitDecimalElement()", () => {
+  describe("test method: UIElementHelper.createUnitDecimalElement()", () => {
     it("should return a valid HTMLElement with empty value", () => {
-      const elem = UIElementHelper.getUnitDecimalElement(id, "prefix");
+      const elem = UIElementHelper.createUnitDecimalElement(id, "prefix");
 
       expect(elem.classList.contains(`${id}-prefix`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-decimal-highlight`)).toBeTruthy();
@@ -109,39 +171,39 @@ describe("test class: UIElementHelper", () => {
     });
 
     it("should return a valid HTMLElement with prefix side and value 1", () => {
-      const elem = UIElementHelper.getUnitDecimalElement(id, "prefix", "1");
+      const elem = UIElementHelper.createUnitDecimalElement(id, "prefix", "1");
       expect(elem.classList.contains(`${id}-prefix`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-decimal-highlight`)).toBeTruthy();
       expect(elem.textContent).toBe("1");
     });
 
     it("should return a valid HTMLElement with suffix side and value 1", () => {
-      const elem = UIElementHelper.getUnitDecimalElement(id, "suffix", "1");
+      const elem = UIElementHelper.createUnitDecimalElement(id, "suffix", "1");
       expect(elem.classList.contains(`${id}-suffix`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-decimal-highlight`)).toBeTruthy();
       expect(elem.textContent).toBe("1");
     });
   });
 
-  describe("test method: UIElementHelper.getOperatorElement()", () => {
+  describe("test method: UIElementHelper.createOperatorElement()", () => {
     it("should return a valid HTMLElement with undefined", () => {
-      const elem = UIElementHelper.getOperatorElement(id, undefined);
+      const elem = UIElementHelper.createOperatorElement(id, undefined);
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-operator`)).toBeTruthy();
       expect(elem.textContent).toBe("");
     });
 
     it("should return a valid HTMLElement with +", () => {
-      const elem = UIElementHelper.getOperatorElement(id, "+");
+      const elem = UIElementHelper.createOperatorElement(id, "+");
       expect(elem.classList.contains(`${id}-item`)).toBeTruthy();
       expect(elem.classList.contains(`${id}-operator`)).toBeTruthy();
       expect(elem.textContent).toBe("+");
     });
   });
 
-  describe("test method: UIElementHelper.getTextBoxElement()", () => {
+  describe("test method: UIElementHelper.createTextBoxElement()", () => {
     it("should return a valid HTMLElement", () => {
-      const elem = UIElementHelper.getTextBoxElement(id);
+      const elem = UIElementHelper.createTextBoxElement(id);
       expect(elem.id).toBe(`${id}-text`);
       expect(elem.getAttribute("name")).toBe(`${id}-text`);
       expect(elem.classList.contains(`${id}-text`)).toBeTruthy();

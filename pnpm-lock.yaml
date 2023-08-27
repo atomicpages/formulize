@@ -87,6 +87,9 @@ importers:
       postcss:
         specifier: ^8.4.28
         version: 8.4.28
+      sass:
+        specifier: ^1.66.1
+        version: 1.66.1
       tailwindcss:
         specifier: ^3.3.3
         version: 3.3.3
@@ -95,7 +98,7 @@ importers:
         version: 5.1.6
       vite:
         specifier: ^4.4.5
-        version: 4.4.5(@types/node@20.5.1)
+        version: 4.4.5(@types/node@20.5.1)(sass@1.66.1)
 
   packages/formulize:
     dependencies:
@@ -1534,7 +1537,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5(@babel/core@7.22.10)
       '@babel/plugin-transform-react-jsx-source': 7.22.5(@babel/core@7.22.10)
       react-refresh: 0.14.0
-      vite: 4.4.5(@types/node@20.5.1)
+      vite: 4.4.5(@types/node@20.5.1)(sass@1.66.1)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5318,7 +5321,7 @@ packages:
       - terser
     dev: true
 
-  /vite@4.4.5(@types/node@20.5.1):
+  /vite@4.4.5(@types/node@20.5.1)(sass@1.66.1):
     resolution: {integrity: sha512-4m5kEtAWHYr0O1Fu7rZp64CfO1PsRGZlD3TAB32UmQlpd7qg15VF7ROqGN5CyqN7HFuwr7ICNM2+fDWRqFEKaA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -5350,6 +5353,7 @@ packages:
       esbuild: 0.18.20
       postcss: 8.4.28
       rollup: 3.28.0
+      sass: 1.66.1
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

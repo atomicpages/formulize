@@ -3,10 +3,7 @@ import { UIHook } from "./ui.hook";
 import type { FormulizeOptions } from "../formulize.interface";
 
 export abstract class UIBase extends UIHook {
-  public constructor(
-    elem: HTMLElement,
-    options: FormulizeOptions = { ...defaultOptions },
-  ) {
+  public constructor(elem: HTMLElement, options?: FormulizeOptions) {
     super();
     this.elem = elem;
     this.options = { ...defaultOptions, ...options };

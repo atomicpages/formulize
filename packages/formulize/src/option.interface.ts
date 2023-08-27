@@ -7,5 +7,4 @@ export type OptionText = {
 };
 
 export type PipeInsert = (data: FormulizeData) => any;
-
 export type PipeParse = (elem: HTMLElement) => any;

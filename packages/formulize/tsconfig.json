@@ -5,9 +5,5 @@
     "emitDeclarationOnly": false,
     "strictNullChecks": true
   },
-  "include": [
-    "src",
-    "vitest.config.mts",
-    "test-setup.ts"
-  ]
+  "include": ["src", "vitest.config.mts", "test-setup.ts"]
 }
