@@ -1,6 +1,7 @@
 import type { Nullable } from "vitest";
 import { FormulizeTokenHelper } from "../token.helper";
 
+// TODO: move to exported functions, class feels too heavy
 export class UIElementHelper {
   public static createElement<K extends keyof HTMLElementTagNameMap>(
     name: K,
@@ -100,7 +101,18 @@ export class UIElementHelper {
    * @param target
    * @param elements
    */
-  public static prependTo(target: Element, elements: Element | Element[]) {
+  public static prependTo(
+    target: Element,
+    elements?: Nullable<NodeList | Element | Element[]>,
+  ) {
+    if (!elements) {
+      return;
+    }
+
+    if (elements instanceof NodeList) {
+      elements = Array.from(elements) as Element[];
+    }
+
     if (!Array.isArray(elements)) {
       elements = [elements];
     }
@@ -117,7 +129,18 @@ export class UIElementHelper {
    * @param target
    * @param elements
    */
-  public static appendTo(target: Element, elements: Element | Element[]) {
+  public static appendTo(
+    target: Element,
+    elements?: NodeList | Element | Element[],
+  ) {
+    if (!elements) {
+      return;
+    }
+
+    if (elements instanceof NodeList) {
+      elements = Array.from(elements) as Element[];
+    }
+
     if (!Array.isArray(elements)) {
       elements = [elements];
     }
@@ -133,6 +156,7 @@ export class UIElementHelper {
 
   public static insertAfter(newElement: HTMLElement, target: HTMLElement) {
     const parent = target.parentNode;
+
     if (parent) {
       if (parent.lastChild === target) {
         parent.appendChild(newElement);

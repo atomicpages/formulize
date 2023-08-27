@@ -15,7 +15,7 @@ export class FormulizeKeyHelper {
     shift?: boolean,
     meta?: boolean,
   ): boolean {
-    if (this.isMacOS()) {
+    if (FormulizeKeyHelper.isMacOS()) {
       return Boolean(shift && meta && key === "r");
     }
 
@@ -28,7 +28,9 @@ export class FormulizeKeyHelper {
     shift?: boolean,
     meta?: boolean,
   ): boolean {
-    return Boolean(this.isMacOS() ? meta && key === "a" : key === "a" && ctrl);
+    return Boolean(
+      FormulizeKeyHelper.isMacOS() ? meta && key === "a" : key === "a" && ctrl,
+    );
   }
 
   public static isBackspace(key: string): boolean {

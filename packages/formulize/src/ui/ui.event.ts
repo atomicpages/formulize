@@ -3,6 +3,36 @@ type Handler<K extends keyof HTMLElementEventMap> = (
   ev: HTMLElementEventMap[K],
 ) => any;
 
+/**
+ * A drop-in replacement for jQuery's event system.
+ * This is a very simple implementation that allows
+ * us to register and unregister events on elements
+ * without having to worry about memory leaks.
+ * @example
+ * UIEvent.on(document.body, "click", (ev) => {
+ *   // handle click event
+ * });
+ *
+ * @example
+ * // turns off all click handlers
+ * UIEvent.off(document.body, "click");
+ *
+ * @example
+ * // turn off a specific event handler
+ * UIEvent.off(document.body, "click", handler);
+ *
+ * @example
+ * // turn off a specific event handler with options
+ * UIEvent.off(document.body, "click", handler, { once: true });
+ *
+ * @example
+ * // trigger an event
+ * UIEvent.trigger(document.body, "click");
+ *
+ * @example
+ * // trigger an event with data
+ * UIEvent.triggerHandler(document.body, "click", { foo: "bar" });
+ */
 export class UIEvent {
   private static events = new Map<
     keyof HTMLElementEventMap,
@@ -37,6 +67,13 @@ export class UIEvent {
     return false;
   }
 
+  /**
+   * Works like jQuery's `on` or `live` method.
+   * @param element the element to attach the event to
+   * @param type the event type
+   * @param handler the handler function
+   * @param opts the event options
+   */
   public static on<
     K extends keyof HTMLElementEventMap,
     E extends HTMLElement = HTMLElement,
@@ -58,6 +95,15 @@ export class UIEvent {
     return this;
   }
 
+  /**
+   * Works like jQuery's `off` or `die` method. Be sure when
+   * specifying handler and opts that they match the original
+   * registration otherwise the event will not be removed.
+   * @param element the element to remove the event from
+   * @param type the event type
+   * @param handler the handler function
+   * @param opts the event options
+   */
   public static off<
     K extends keyof HTMLElementEventMap,
     E extends HTMLElement = HTMLElement,
@@ -119,5 +165,29 @@ export class UIEvent {
   >(element: E, type: K) {
     element.dispatchEvent(new Event(type));
     return this;
+  }
+
+  /**
+   * Inspired by jQuery's triggerHandler method
+   * this allows you to trigger an event with
+   * extra data. Like jQuery's triggerHandler
+   * this will not bubble up the DOM and wil;
+   * invoke the handler directly.
+   * @param element the element to trigger the event on
+   * @param type the event type
+   * @param detail custom data to send to the handler
+   */
+  public static triggerHandler<
+    K extends keyof HTMLElementEventMap,
+    E extends HTMLElement = HTMLElement,
+    T = any,
+  >(element: E, type: K, detail?: T) {
+    const event = new CustomEvent<T>(type, {
+      bubbles: false,
+      cancelable: true,
+      detail,
+    });
+
+    element.dispatchEvent(event);
   }
 }

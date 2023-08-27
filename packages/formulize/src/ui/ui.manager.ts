@@ -4,9 +4,9 @@ import type { Tree } from "metric-parser/dist/types/tree/simple.tree/type";
 import { UIElementHelper } from "./ui.element.helper";
 import type { ElementPosition, FormulizeData, Position } from "./ui.interface";
 import { UIHelper } from "./ui.helper";
-import { UIPipe } from "./ui.pipe";
+import { UIData } from "./ui.data";
 
-export abstract class UIManager extends UIPipe {
+export abstract class UIManager extends UIData {
   protected prevCursorIndex = 0;
   protected prevPosition: Position = { x: 0, y: 0 };
   protected dragged: boolean;
@@ -165,22 +165,29 @@ export abstract class UIManager extends UIPipe {
     const dragElem = UIElementHelper.createDragElement(this.options.id);
     this.container.prepend(dragElem);
 
-    // TODO: figure out if this children can return an array
-    // and if prependTo can receive an array
-    this.container
-      .children(`:not(".${this.options.id}-cursor")`)
-      .appendTo(dragElem);
+    UIElementHelper.appendTo(
+      dragElem,
+      this.container.querySelectorAll(`:not(.${this.options.id}-cursor)`),
+    );
   }
 
   public selectRange(start: number, end: number): void {
-    if (!this.dragElem.length) {
+    if (!this.dragElem) {
       return;
     }
 
-    this.container
-      .children(`:not(".${this.options.id}-cursor")`)
+    const elements = Array.from(
+      this.container.querySelectorAll(`:not(.${this.options.id}-cursor)`),
+    )
+      .slice(start + 1)
+      .slice(0, end - start);
+
+    Array.from(
+      this.container.querySelectorAll(`:not(.${this.options.id}-cursor)`),
+    )
       .filter(`:gt("${start}")`)
       .filter(`:lt("${end - start}")`)
+      // FIXME: need to figure this out
       .add(
         this.container.children(`:not(".${this.options.id}-cursor")`).eq(start),
       )
@@ -274,21 +281,37 @@ export abstract class UIManager extends UIPipe {
 
   protected dragLeft(): void {
     if (
+      this.dragElem &&
       UIElementHelper.isDrag(
         this.options.id,
         this.cursor.previousElementSibling as HTMLElement,
       )
     ) {
-      this.dragElem.prev().prependTo(this.dragElem);
-      this.moveCursorAfter(this.dragElem.get(0));
+      UIElementHelper.prependTo(
+        this.dragElem,
+        this.dragElem?.previousElementSibling,
+      );
+
+      this.moveCursorAfter(this.dragElem as HTMLElement);
+
       return;
     }
 
-    if (UIElementHelper.isDrag(this.options.id, this.cursor.next().get(0))) {
-      const lastDraggedElem = this.dragElem.children().last();
-      lastDraggedElem.insertAfter(this.dragElem);
+    if (
+      UIElementHelper.isDrag(
+        this.options.id,
+        this.cursor.nextElementSibling as HTMLElement | null,
+      )
+    ) {
+      const children = this.dragElem?.children;
+      if (children?.length) {
+        UIElementHelper.insertAfter(
+          children[children.length - 1] as HTMLElement,
+          this.dragElem as HTMLElement,
+        );
+      }
 
-      if (!this.dragElem.children().length) {
+      if (!this.dragElem?.children.length) {
         this.removeDrag();
       }
 
@@ -548,7 +571,6 @@ export abstract class UIManager extends UIPipe {
     }
 
     const isValid = valid(data);
-
     this.updateStatus(isValid);
 
     if (extractor) {
