@@ -57,7 +57,12 @@ export abstract class UIManager extends UIData {
   private getExpression(): FormulizeData[] {
     return Array.from(
       this.container.querySelectorAll(`.${this.options.id}-item`),
-    ).map((elem: HTMLElement) => UIHelper.getDataValue(this.pipeParse(elem)));
+    ).map((elem: HTMLElement) => {
+      return UIHelper.getDataValue(
+        // prefer node data over the element
+        this.pipeParse(this.getNodeData(elem) ?? elem),
+      );
+    });
   }
 
   protected startDrag(position: Position): void {
@@ -320,17 +325,38 @@ export abstract class UIManager extends UIData {
   }
 
   protected dragRight(): void {
-    if (UIElementHelper.isDrag(this.options.id, this.cursor.next().get(0))) {
-      this.dragElem.next().appendTo(this.dragElem);
-      this.moveCursorBefore(this.dragElem.get(0));
+    if (
+      this.dragElem &&
+      UIElementHelper.isDrag(
+        this.options.id,
+        this.cursor.nextElementSibling as HTMLElement,
+      )
+    ) {
+      UIElementHelper.appendTo(
+        this.dragElem,
+        this.dragElem?.nextElementSibling,
+      );
+
+      this.moveCursorBefore(this.dragElem as HTMLElement);
       return;
     }
 
-    if (UIElementHelper.isDrag(this.options.id, this.cursor.prev().get(0))) {
-      const firstDraggedElem = this.dragElem.children().first();
-      firstDraggedElem.insertBefore(this.dragElem);
+    if (
+      UIElementHelper.isDrag(
+        this.options.id,
+        this.cursor.previousElementSibling as HTMLElement,
+      )
+    ) {
+      const firstDraggedElem = this.dragElem?.firstElementChild;
 
-      if (!this.dragElem.children().length) {
+      if (firstDraggedElem && this.dragElem) {
+        UIElementHelper.insertBefore(
+          firstDraggedElem as HTMLElement,
+          this.dragElem,
+        );
+      }
+
+      if (this.dragElem?.children.length === 0) {
         this.removeDrag();
       }
 
@@ -492,7 +518,7 @@ export abstract class UIManager extends UIData {
 
     const pipedData = this.pipeInsert(data);
 
-    if (!this.cursor?.length || position) {
+    if (!this.cursor || position) {
       this.pick(position);
     }
 

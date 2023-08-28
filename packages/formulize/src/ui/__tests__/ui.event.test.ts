@@ -45,4 +45,46 @@ describe("ui.event", () => {
     el2.click();
     expect(click1).toHaveBeenCalledTimes(3);
   });
+
+  it("should trigger events", () => {
+    const base = document.createElement("div");
+    const el1 = document.createElement("div");
+    base.appendChild(el1);
+
+    const click1 = vi.fn();
+    const click2 = vi.fn();
+
+    UIEvent.on(base, "click", click1);
+    UIEvent.on(base, "click", click2);
+    UIEvent.on(el1, "click", click1);
+
+    UIEvent.trigger(el1, "click");
+    expect(click1).toHaveBeenCalledTimes(2);
+    expect(click2).toHaveBeenCalledTimes(1);
+
+    UIEvent.trigger(el1, "click");
+    expect(click1).toHaveBeenCalledTimes(4);
+  });
+
+  it("should trigger events with data", () => {
+    const base = document.createElement("div");
+    const el1 = document.createElement("div");
+    base.appendChild(el1);
+
+    const click1 = vi.fn();
+    const click2 = vi.fn();
+
+    UIEvent.on(base, "click", click1);
+    UIEvent.on(base, "click", click2);
+    UIEvent.on(el1, "click", click1);
+
+    UIEvent.triggerHandler(el1, "click", { foo: "bar" });
+    expect(click1).toHaveBeenCalledTimes(1);
+
+    expect(click1).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: { foo: "bar" },
+      }),
+    );
+  });
 });

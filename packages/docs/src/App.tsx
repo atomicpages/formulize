@@ -10,10 +10,21 @@ export default function App() {
   useEffect(() => {
     if (ref.current && !formula.current) {
       formula.current = new UI(ref.current, {
-        id: "formula",
+        id: "formulize",
       });
     }
   }, []);
 
-  return <div id="formula" ref={ref} />;
+  return (
+    <main>
+      <button
+        className="rounded-md bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 focus:bg-blue-600 focus:duration-0 transition-colors duration-200 cursor-pointer"
+        onClick={() => {
+          console.log(formula.current.getData());
+        }}>
+        Get Data
+      </button>
+      <div id="formulize" ref={ref} />
+    </main>
+  );
 }

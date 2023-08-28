@@ -29,47 +29,48 @@
     .formulize-cursor {
       display: inline-block;
       vertical-align: middle;
-      height: 16px;
-      width: 3px;
-      background-color: rgba(0, 0, 0, 0.6);
+      @apply h-5;
+      @apply w-[3px];
+      @apply bg-black/60;
+      @apply dark:bg-white/70;
       animation: blink 0.5s ease alternate infinite;
     }
     .formulize-item {
-      display: inline;
+      @apply inline;
       vertical-align: middle;
       padding: 4px 10px;
       word-break: break-all;
-      margin: 6px;
-      background-color: #ffffff;
-      border-radius: 999px;
+      @apply m-[6px];
+      @apply bg-white;
+      @apply rounded-full;
       color: #333333;
-      position: relative;
+      @apply relative;
       overflow: hidden;
     }
     .formulize-operator {
       color: #f6474e;
     }
     .formulize-bracket {
-      background-color: transparent;
+      @apply bg-transparent;
       color: #12c2b7;
     }
   }
 
   .formulize-alert {
-    position: absolute;
-    width: 140px;
+    @apply absolute;
+    @apply w-[140px];
     height: 42px;
     line-height: 38px;
     color: #777777;
-    box-sizing: border-box;
+    @apply box-border;
     border: 1px solid #d8d8d8;
     border-top: 3px solid #ababab;
     border-right: 0;
     background-color: #fafafa;
     text-align: center;
-    top: 0;
-    right: 1px;
-    z-index: 10;
+    @apply top-0;
+    @apply right-1;
+    @apply z-10;
     &.formulize-alert-good {
       color: #88ccab;
       border-top-color: #88ccab;

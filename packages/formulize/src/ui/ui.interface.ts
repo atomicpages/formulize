@@ -17,5 +17,4 @@ export type Behavior = {
 };
 
 export type FormulizeData = string | number | HTMLElement;
-
 export type FormulizeEvent = "input";

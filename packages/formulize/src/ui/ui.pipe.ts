@@ -1,6 +1,7 @@
 import type { FormulizeData, FormulizeEvent } from "./ui.interface";
 import { UIHelper } from "./ui.helper";
 import { UIDom } from "./ui.dom";
+import { UIEvent } from "./ui.event";
 
 export class UIPipe extends UIDom {
   protected pipeInsert(data: FormulizeData): any {
@@ -8,9 +9,7 @@ export class UIPipe extends UIDom {
       return data;
     }
 
-    const insertData = UIHelper.isDOM(data) ? UIHelper.getDOM(data) : data;
-
-    return this.options.pipe.insert(insertData);
+    return this.options.pipe.insert(data);
   }
 
   protected pipeParse(elem: HTMLElement): any {
@@ -22,8 +21,9 @@ export class UIPipe extends UIDom {
   }
 
   protected pipeTrigger(name: FormulizeEvent, value: any): void {
-    $(this.elem).triggerHandler(`${this.options.id}.${name}`, value);
+    UIEvent.triggerHandler(this.elem, name, value);
     const eventPipe: Function = (this.options as any)[name];
+
     if (eventPipe) {
       eventPipe(value);
     }

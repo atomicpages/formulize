@@ -148,17 +148,43 @@ export class UIEvent {
     return this;
   }
 
+  /**
+   * Works like jQuery's `one` method. This will
+   * register the event handler and then remove
+   * it after the first time it's invoked. However,
+   * using `UIEvent.off` will not work since the
+   * handler is not added to the internal map. See
+   * the example for how to remove these manually.
+   * @param element the element to attach the event to
+   * @param type the event type
+   * @param handler the handler function
+   * @param opts the event options
+   * @example
+   * UIEvent.once(document.body, "click", console.log, { passive: true });
+   * document.body.click(); // logs click event
+   *
+   * // remove using DOM APIs
+   * document.body.removeEventListener("click", console.log, { passive: true });
+   */
   public static once<
     K extends keyof HTMLElementEventMap,
     E extends HTMLElement = HTMLElement,
   >(element: E, type: K, handler: Handler<K>, opts?: AddEventListenerOptions) {
-    // skip adding the event if it fires once since it is automatically removed
-    // while not complete, it allows us to avoid having to track the event
-    // via something like RxJs in order to remove it from the map
+    // skip adding when this is used since it'll be removed automatically
+    // when complete.
     element.addEventListener(type, handler, { ...opts, once: true });
     return this;
   }
 
+  /**
+   * Works like jQuery's `trigger` method. This will
+   * trigger the event on the element. This is a
+   * very simple implementation that does not
+   * support custom events. Right now only `Event`
+   * is created and dispatched.
+   * @param element the element to trigger the event on
+   * @param type the event type
+   */
   public static trigger<
     K extends keyof HTMLElementEventMap,
     E extends HTMLElement = HTMLElement,

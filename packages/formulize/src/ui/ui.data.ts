@@ -1,3 +1,4 @@
+import type { Nullable } from "vitest";
 import { UIPipe } from "./ui.pipe";
 import deepmerge from "deepmerge";
 
@@ -18,8 +19,8 @@ export class UIData extends UIPipe {
     this.mergeStrategy = opts?.strategy ?? "shallow";
   }
 
-  public getNodeData() {
-    return this.nodeData;
+  public getNodeData(node: HTMLElement): Nullable<Record<string, any>> {
+    return this.nodeData.get(node);
   }
 
   protected setNodeData(node: HTMLElement, data: Record<string, any>) {
