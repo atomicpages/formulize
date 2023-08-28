@@ -131,7 +131,7 @@ export class UIElementHelper {
    */
   public static appendTo(
     target: Element,
-    elements?: NodeList | Element | Element[],
+    elements?: Nullable<NodeList | Element | Element[]>,
   ) {
     if (!elements) {
       return;
@@ -150,7 +150,7 @@ export class UIElementHelper {
     }
   }
 
-  public static insertBefore(newElement: HTMLElement, target: HTMLElement) {
+  public static insertBefore(newElement: Element, target: Element) {
     target.parentNode?.insertBefore(newElement, target);
   }
 

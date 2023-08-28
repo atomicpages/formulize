@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "Debug Current Test File",
       "autoAttachChildProcesses": true,
-      "cwd": "${workspaceRoot}/packages/formulize",
+      "cwd": "${workspaceRoot}",
       "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
       "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
       "args": ["run", "${relativeFile}"],

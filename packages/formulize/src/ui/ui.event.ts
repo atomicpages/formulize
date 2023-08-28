@@ -163,7 +163,14 @@ export class UIEvent {
     K extends keyof HTMLElementEventMap,
     E extends HTMLElement = HTMLElement,
   >(element: E, type: K) {
-    element.dispatchEvent(new Event(type));
+    // TODO: this should be more rich and map to the correct
+    // event object (e.g. click -> MouseEvent)
+    element.dispatchEvent(
+      new Event(type, {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
     return this;
   }
 

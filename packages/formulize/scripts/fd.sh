@@ -3,4 +3,4 @@ set -e
 
 readonly SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 cd $SCRIPT_DIR && cd ..
-pnpm fd -g '**/*.{ts,tsx}' -E '*.spec.*' src
+pnpm fd -g '**/*.{ts,tsx}' -E '*.spec.*' -E '*.test.*' src
