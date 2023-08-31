@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 import type { Nullable } from "vitest";
 import { FormulizeTokenHelper } from "../token.helper";
 
@@ -5,13 +6,13 @@ import { FormulizeTokenHelper } from "../token.helper";
 export class UIElementHelper {
   public static createElement<K extends keyof HTMLElementTagNameMap>(
     name: K,
-    classes: string[],
+    classes?: string[],
     attrs?: Record<string, string>,
     content?: string,
   ) {
     const elem = document.createElement(name);
 
-    elem.classList.add(...classes);
+    elem.classList.add(...(classes ?? []));
 
     if (attrs) {
       Object.entries(attrs).forEach(([key, value]) =>
@@ -117,9 +118,12 @@ export class UIElementHelper {
       elements = [elements];
     }
 
-    for (let i = elements.length - 1; i >= 0; i--) {
-      // eslint-disable-next-line security/detect-object-injection
-      target.insertBefore(elements[i], target.firstChild);
+    for (const element of elements) {
+      if (target.hasChildNodes()) {
+        target.insertBefore(element, target.firstChild);
+      } else {
+        target.append(element);
+      }
     }
   }
 
@@ -145,13 +149,32 @@ export class UIElementHelper {
       elements = [elements];
     }
 
-    for (const element of elements) {
-      target.appendChild(element);
-    }
+    target.append(...elements);
   }
 
-  public static insertBefore(newElement: Element, target: Element) {
-    target.parentNode?.insertBefore(newElement, target);
+  public static insertBefore(
+    newElements: Nullable<HTMLElement | HTMLElement[] | NodeList | Element[]>,
+    target: HTMLElement,
+  ) {
+    if (!newElements) {
+      return;
+    }
+
+    if (newElements instanceof NodeList) {
+      newElements = Array.from(newElements) as HTMLElement[];
+    }
+
+    if (!Array.isArray(newElements)) {
+      newElements = [newElements];
+    }
+
+    const parent = target.parentNode;
+
+    if (parent) {
+      for (const newElement of newElements) {
+        parent.insertBefore(newElement, target);
+      }
+    }
   }
 
   public static insertAfter(newElement: HTMLElement, target: HTMLElement) {
@@ -159,7 +182,7 @@ export class UIElementHelper {
 
     if (parent) {
       if (parent.lastChild === target) {
-        parent.appendChild(newElement);
+        parent.append(newElement);
       } else {
         parent.insertBefore(newElement, target.nextSibling);
       }
@@ -228,12 +251,12 @@ export class UIElementHelper {
 
     if (left !== undefined) {
       const prefix = this.createUnitDecimalElement(id, "prefix", left);
-      elem.appendChild(prefix);
+      elem.append(prefix);
     }
 
     if (right !== undefined) {
       const suffix = this.createUnitDecimalElement(id, "suffix", `.${right}`);
-      elem.appendChild(suffix);
+      elem.append(suffix);
     }
   }
 

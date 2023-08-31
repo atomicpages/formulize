@@ -505,7 +505,11 @@ export abstract class UIManager extends UIData {
 
   public removeDrag(): void {
     if (this.dragElem) {
-      this.dragElem.children().insertBefore(this.dragElem);
+      UIElementHelper.insertBefore(
+        Array.from(this.dragElem.children),
+        this.dragElem,
+      );
+
       this.dragElem.remove();
       this.triggerUpdate();
     }

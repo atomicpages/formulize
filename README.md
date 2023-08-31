@@ -79,4 +79,8 @@ export const Formulize = () => {
 }
 ```
 
+### Styling
+
+Sass + tailwind drives the styles for this project. When specifying a custom
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FKennethanCeyer%2Fformulize.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FKennethanCeyer%2Fformulize?ref=badge_large)

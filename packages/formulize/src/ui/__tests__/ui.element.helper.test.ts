@@ -41,15 +41,15 @@ describe("test class: UIElementHelper", () => {
       <li class="e">e</li>
       </ul>`;
 
-      expect(UIElementHelper.prevAll(parent.querySelector(".b")!)).toHaveLength(
+      expect(UIElementHelper.prevAll(parent.querySelector(".b"))).toHaveLength(
         1,
       );
 
-      expect(UIElementHelper.prevAll(parent.querySelector(".e")!)).toHaveLength(
+      expect(UIElementHelper.prevAll(parent.querySelector(".e"))).toHaveLength(
         4,
       );
 
-      expect(UIElementHelper.prevAll(parent.querySelector(".a")!)).toHaveLength(
+      expect(UIElementHelper.prevAll(parent.querySelector(".a"))).toHaveLength(
         0,
       );
     });

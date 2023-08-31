@@ -7,4 +7,4 @@ export const defaultOptions: FormulizeOptions = {
     error: "error",
     pass: "passed",
   },
-};
+} as const;
