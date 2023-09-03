@@ -21,12 +21,11 @@ $base: formulize;
     position: relative;
     line-height: 2.8;
     .#{$base}-drag {
-      display: inline;
-      margin-top: -4px;
-      padding: 12px 0;
+      display: inline-block;
       border-radius: 3px;
-      vertical-align: middle;
+      @apply px-1;
       background-color: rgba(26, 94, 255, 0.15);
+      @apply dark:bg-blue-400/40;
     }
     .#{$base}-cursor {
       display: inline-block;

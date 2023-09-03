@@ -334,4 +334,23 @@ describe("test class: UIElementHelper", () => {
       expect(UIElementHelper.isOperator(id, elem)).toBe(result);
     });
   });
+
+  describe("test method: UIElementHelper.children()", () => {
+    it("should return children of the specified element", () => {
+      const parent = document.createElement("div");
+      parent.innerHTML = `<ul>
+      <li class="a"><span>a</span></li>
+      <li class="b"><span>b</span></li>
+      <li class="c"><span>c</span></li>
+      <li class="d"><span>d</span></li>
+      <li class="e"><span>e</span></li>
+      </ul>`;
+
+      expect(UIElementHelper.children(parent)).toHaveLength(1);
+
+      expect(
+        UIElementHelper.children(parent.querySelector("ul")!),
+      ).toHaveLength(5);
+    });
+  });
 });

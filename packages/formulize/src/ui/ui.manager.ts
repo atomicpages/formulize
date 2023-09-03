@@ -168,11 +168,14 @@ export abstract class UIManager extends UIData {
   public selectAll(): void {
     this.removeDrag();
     const dragElem = UIElementHelper.createDragElement(this.options.id);
-    this.container.prepend(dragElem);
+    UIElementHelper.prependTo(this.container, dragElem);
 
     UIElementHelper.appendTo(
       dragElem,
-      this.container.querySelectorAll(`:not(.${this.options.id}-cursor)`),
+      UIElementHelper.children(
+        this.container,
+        `:not(.${this.options.id}-cursor)`,
+      ),
     );
   }
 

@@ -56,7 +56,7 @@ export class UIElementHelper {
    * Like jQuery's `prevAll` method, this returns all the previous
    * @param element the element to start from
    */
-  public static prevAll(element?: Nullable<HTMLElement>): HTMLElement[] {
+  public static prevAll(element?: Nullable<Element>): HTMLElement[] {
     const siblings: HTMLElement[] = [];
 
     if (!element) {
@@ -76,7 +76,7 @@ export class UIElementHelper {
     return siblings;
   }
 
-  public static nextAll(element?: Nullable<HTMLElement>): HTMLElement[] {
+  public static nextAll(element?: Nullable<Element>): HTMLElement[] {
     const siblings: HTMLElement[] = [];
 
     if (!element) {
@@ -99,8 +99,8 @@ export class UIElementHelper {
   /**
    * Like jQuery's `prependTo` method this prepends any
    * and all elements to the target as children of target.
-   * @param target
-   * @param elements
+   * @param target The target element to prepend to.
+   * @param elements The elements to prepend.
    */
   public static prependTo(
     target: Element,
@@ -110,7 +110,7 @@ export class UIElementHelper {
       return;
     }
 
-    if (elements instanceof NodeList) {
+    if (elements instanceof NodeList || elements instanceof HTMLCollection) {
       elements = Array.from(elements) as Element[];
     }
 
@@ -119,12 +119,30 @@ export class UIElementHelper {
     }
 
     for (const element of elements) {
-      if (target.hasChildNodes()) {
-        target.insertBefore(element, target.firstChild);
-      } else {
-        target.append(element);
+      if (element !== target) {
+        if (target.hasChildNodes()) {
+          target.insertBefore(element, target.firstChild);
+        } else {
+          target.append(element);
+        }
       }
     }
+  }
+
+  public static children(element: Element, selector?: string | string[]) {
+    const children = Array.from(element.children);
+
+    if (selector) {
+      if (Array.isArray(selector)) {
+        return children.filter((child) =>
+          selector.some((s) => child.matches(s)),
+        );
+      }
+
+      return children.filter((child) => child.matches(selector));
+    }
+
+    return element.children;
   }
 
   /**
@@ -141,7 +159,7 @@ export class UIElementHelper {
       return;
     }
 
-    if (elements instanceof NodeList) {
+    if (elements instanceof NodeList || elements instanceof HTMLCollection) {
       elements = Array.from(elements) as Element[];
     }
 
@@ -149,7 +167,7 @@ export class UIElementHelper {
       elements = [elements];
     }
 
-    target.append(...elements);
+    target.append(...elements.filter((e) => e !== target));
   }
 
   public static insertBefore(
