@@ -10,8 +10,8 @@ export abstract class UIHook extends UIManager {
     }
 
     this.analyzeKey(e.key, e.ctrlKey, e.shiftKey, e.metaKey);
-
     const key = FormulizeKeyHelper.getValue(e.key, e.shiftKey);
+
     if (key === undefined) {
       return;
     }

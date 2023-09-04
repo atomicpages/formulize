@@ -57,12 +57,32 @@ export class FormulizeKeyHelper {
     return key === KeyCodes.DownArrow;
   }
 
-  public static isHome(key: string): boolean {
-    return key === KeyCodes.Home;
+  public static isHome(
+    key: string,
+    ctrl: boolean,
+    shift: boolean,
+    meta: boolean,
+  ): boolean {
+    // macOS meta + left arrow
+    // full keyboards on macOS have the "home" key
+    return (
+      key === KeyCodes.Home ||
+      (FormulizeKeyHelper.isMacOS() && meta && key === KeyCodes.LeftArrow)
+    );
   }
 
-  public static isEnd(key: string): boolean {
-    return key === KeyCodes.End;
+  public static isEnd(
+    key: string,
+    ctrl: boolean,
+    shift: boolean,
+    meta: boolean,
+  ): boolean {
+    // macOS meta + right arrow
+    // full keyboards on macOS have the "end" key
+    return (
+      key === KeyCodes.End ||
+      (FormulizeKeyHelper.isMacOS() && meta && key === KeyCodes.RightArrow)
+    );
   }
 
   public static doReload(): void {

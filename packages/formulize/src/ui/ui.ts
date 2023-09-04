@@ -28,22 +28,12 @@ export class UI extends UIBase {
         doBehavior: FormulizeKeyHelper.doAction(() => this.removeAfter()),
       },
       {
-        predicate: FormulizeKeyHelper.isLeft,
-        doBehavior: FormulizeKeyHelper.doAction(() =>
-          this.moveLeftCursor(shift),
-        ),
-      },
-      {
+        // TODO: figure out what this is supposed to do
         predicate: FormulizeKeyHelper.isUp,
         doBehavior: FormulizeKeyHelper.doAction(() => this.moveUpCursor()),
       },
       {
-        predicate: FormulizeKeyHelper.isRight,
-        doBehavior: FormulizeKeyHelper.doAction(() =>
-          this.moveRightCursor(shift),
-        ),
-      },
-      {
+        // TODO: figure out what this is supposed to do
         predicate: FormulizeKeyHelper.isDown,
         doBehavior: FormulizeKeyHelper.doAction(() => this.moveDownCursor()),
       },
@@ -57,6 +47,18 @@ export class UI extends UIBase {
         predicate: FormulizeKeyHelper.isEnd,
         doBehavior: FormulizeKeyHelper.doAction(() =>
           this.moveLastCursor(shift),
+        ),
+      },
+      {
+        predicate: FormulizeKeyHelper.isLeft,
+        doBehavior: FormulizeKeyHelper.doAction(() =>
+          this.moveLeftCursor(shift),
+        ),
+      },
+      {
+        predicate: FormulizeKeyHelper.isRight,
+        doBehavior: FormulizeKeyHelper.doAction(() =>
+          this.moveRightCursor(shift),
         ),
       },
     ];
@@ -77,14 +79,20 @@ export class UI extends UIBase {
     const blur = () => this.blur();
     const selectAll = () => this.selectAll();
 
-    const mouseDown = (e: MouseEvent) =>
-      this.startDrag({ x: e.offsetX, y: e.offsetY });
+    const mouseDown = (e: MouseEvent) => {
+      console.log("mouseDown");
+      return this.startDrag({ x: e.offsetX, y: e.offsetY });
+    };
 
-    const mouseUp = (e: MouseEvent) =>
-      this.endDrag({ x: e.offsetX, y: e.offsetY });
+    const mouseUp = (e: MouseEvent) => {
+      console.log("mouseUp");
+      return this.endDrag({ x: e.offsetX, y: e.offsetY });
+    };
 
-    const mouseMove = (e: MouseEvent) =>
-      this.moveDrag({ x: e.offsetX, y: e.offsetY });
+    const mouseMove = (e: MouseEvent) => {
+      console.log("mouseMove");
+      return this.moveDrag({ x: e.offsetX, y: e.offsetY });
+    };
 
     const keyDown = (event: KeyboardEvent) => {
       this.hookKeyDown(event);
@@ -93,6 +101,13 @@ export class UI extends UIBase {
     UIEvent.on(this.textBox, "blur", blur);
     UIEvent.on(this.textBox, "dblclick", selectAll);
     UIEvent.on(this.textBox, "mousedown", mouseDown);
+
+    // TODO: implement click for cursor, this required
+    // us to track where mousedown and click occur
+    // so we can determine if the cursor moved
+    // enough for selectRange to be called instead
+    // of placing the cursor
+    // UIEvent.on(this.textBox, "click", console.log);
     UIEvent.on(this.textBox, "mouseup", mouseUp);
     UIEvent.on(this.textBox, "mousemove", mouseMove);
     UIEvent.on(this.textBox, "keydown", keyDown);

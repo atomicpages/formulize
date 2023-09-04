@@ -5,6 +5,7 @@ import { UIElementHelper } from "./ui.element.helper";
 import type { ElementPosition, FormulizeData, Position } from "./ui.interface";
 import { UIHelper } from "./ui.helper";
 import { UIData } from "./ui.data";
+import type { Nullable } from "../types";
 
 export abstract class UIManager extends UIData {
   protected prevCursorIndex = 0;
@@ -16,7 +17,7 @@ export abstract class UIManager extends UIData {
     this.removeCursor();
 
     this.cursor = UIElementHelper.createCursorElement(this.options.id);
-    this.container.append(this.cursor);
+    UIElementHelper.appendTo(this.container, this.cursor);
 
     const closestUnitElem = this.findClosestUnit(position);
 
@@ -107,18 +108,21 @@ export abstract class UIManager extends UIData {
     const dragElem = UIElementHelper.createDragElement(this.options.id);
 
     if (this.cursorIndex >= this.prevCursorIndex) {
-      this.cursor.insertAdjacentElement("afterbegin", dragElem);
+      UIElementHelper.insertBefore(dragElem, this.cursor);
     } else {
-      this.cursor.insertAdjacentElement("afterend", dragElem);
+      UIElementHelper.insertAfter(dragElem, this.cursor);
     }
 
     this.selectRange(positions[0], positions[1]);
   }
 
-  private findClosestUnit(position: Position): HTMLElement {
+  private findClosestUnit(position: Position): Nullable<HTMLElement> {
     const unitPositions: ElementPosition[] = Array.from(
-      this.container.querySelectorAll(`*:not(.${this.options.id}-cursor)`),
-    ).map((elem) => {
+      UIElementHelper.children(
+        this.container,
+        `*:not(.${this.options.id}-cursor)`,
+      ),
+    ).map((elem: HTMLElement) => {
       const { left, top, width } = elem.getBoundingClientRect();
 
       return {
@@ -184,22 +188,10 @@ export abstract class UIManager extends UIData {
       return;
     }
 
-    const elements = Array.from(
-      this.container.querySelectorAll(`:not(.${this.options.id}-cursor)`),
-    )
-      .slice(start + 1)
-      .slice(0, end - start);
-
-    Array.from(
-      this.container.querySelectorAll(`:not(.${this.options.id}-cursor)`),
-    )
-      .filter(`:gt("${start}")`)
-      .filter(`:lt("${end - start}")`)
-      // FIXME: need to figure this out
-      .add(
-        this.container.children(`:not(".${this.options.id}-cursor")`).eq(start),
-      )
-      .appendTo(this.dragElem);
+    const children = UIElementHelper.children(this.container);
+    Array.from(children)
+      .slice(start)
+      .slice(end - start);
   }
 
   protected removeBefore(): void {
@@ -400,8 +392,10 @@ export abstract class UIManager extends UIData {
       const dragElem = UIElementHelper.createDragElement(this.options.id);
       this.cursor.before(dragElem);
 
-      // TODO: fix this
-      UIElementHelper.prependTo(this.dragElem, prevCursorElem);
+      if (this.dragElem) {
+        UIElementHelper.prependTo(this.dragElem, prevCursorElem);
+      }
+
       return;
     }
 
@@ -437,7 +431,11 @@ export abstract class UIManager extends UIData {
 
       const dragElem = UIElementHelper.createDragElement(this.options.id);
       this.cursor.after(dragElem);
-      UIElementHelper.appendTo(this.dragElem, nextCursorElem);
+
+      if (this.dragElem) {
+        UIElementHelper.appendTo(this.dragElem, nextCursorElem);
+      }
+
       return;
     }
 

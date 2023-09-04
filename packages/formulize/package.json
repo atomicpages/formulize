@@ -45,9 +45,7 @@
     "build:esm": "esbuild --sourcemap --outdir=dist/esm --format=esm --target=node18 `./scripts/fd.sh`",
     "build:types": "tsc -p tsconfig.build.json",
     "build:sass": "sass style/formulize.scss dist/style/formulize.css",
-    "pretest": "pnpm build:sass",
     "test": "vitest --run",
-    "posttest": "rm style/*.css*",
     "check-types": "tsc --emitDeclarationOnly null --noEmit"
   },
   "dependencies": {

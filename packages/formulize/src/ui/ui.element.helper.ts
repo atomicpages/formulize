@@ -104,7 +104,7 @@ export class UIElementHelper {
    */
   public static prependTo(
     target: Element,
-    elements?: Nullable<NodeList | Element | Element[]>,
+    elements?: Nullable<NodeList | HTMLCollection | Element | Element[]>,
   ) {
     if (!elements) {
       return;
@@ -129,6 +129,12 @@ export class UIElementHelper {
     }
   }
 
+  /**
+   * Gets the immediate children of the element.
+   * @param element The element to get the children of.
+   * @param selector The optional selector to filter the children by.
+   * @returns
+   */
   public static children(element: Element, selector?: string | string[]) {
     const children = Array.from(element.children);
 
@@ -153,7 +159,7 @@ export class UIElementHelper {
    */
   public static appendTo(
     target: Element,
-    elements?: Nullable<NodeList | Element | Element[]>,
+    elements?: Nullable<NodeList | HTMLCollection | Element | Element[]>,
   ) {
     if (!elements) {
       return;
@@ -171,14 +177,17 @@ export class UIElementHelper {
   }
 
   public static insertBefore(
-    newElements: Nullable<HTMLElement | HTMLElement[] | NodeList | Element[]>,
-    target: HTMLElement,
+    newElements: Nullable<Element | NodeList | HTMLCollection | Element[]>,
+    target: Element,
   ) {
     if (!newElements) {
       return;
     }
 
-    if (newElements instanceof NodeList) {
+    if (
+      newElements instanceof NodeList ||
+      newElements instanceof HTMLCollection
+    ) {
       newElements = Array.from(newElements) as HTMLElement[];
     }
 
@@ -195,7 +204,7 @@ export class UIElementHelper {
     }
   }
 
-  public static insertAfter(newElement: HTMLElement, target: HTMLElement) {
+  public static insertAfter(newElement: Element, target: Element) {
     const parent = target.parentNode;
 
     if (parent) {
